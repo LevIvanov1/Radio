@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Equalizer"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+    <SeekBar
+        android:id="@+id/band1SeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <SeekBar
+        android:id="@+id/band2SeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <SeekBar
+        android:id="@+id/band3SeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <SeekBar
+        android:id="@+id/band4SeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <SeekBar
+        android:id="@+id/band5SeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bass Boost"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_marginTop="16dp"/>
+
+    <SeekBar
+        android:id="@+id/bassBoostSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
