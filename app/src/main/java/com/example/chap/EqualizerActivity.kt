@@ -3,16 +3,19 @@ package com.example.chap
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.os.Bundle
+import android.widget.Button
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.exoplayer2.util.Log
 
 class EqualizerActivity : AppCompatActivity() {
 
     private var equalizer: Equalizer? = null
     private var bassBoost: BassBoost? = null
-    private lateinit var bandSeekBars: Array<SeekBar>
-    private lateinit var bassBoostSeekBar: SeekBar
     private var audioSessionId = 0
+    private lateinit var bassBoostSeekBar: SeekBar
+    private lateinit var bandSeekBars: List<SeekBar>
+    private lateinit var resetButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,17 +25,20 @@ class EqualizerActivity : AppCompatActivity() {
 
         if (audioSessionId == 0) {
             // Обработка ошибки: Audio Session ID не предоставлен
+            Log.e("Equalizer", "Audio Session ID not provided")
             finish()
             return
         }
 
-        bandSeekBars = arrayOf(
+        bandSeekBars = listOf(
             findViewById(R.id.band1SeekBar),
             findViewById(R.id.band2SeekBar),
             findViewById(R.id.band3SeekBar),
             findViewById(R.id.band4SeekBar),
             findViewById(R.id.band5SeekBar)
         )
+
+        resetButton = findViewById(R.id.buttonReset)
         bassBoostSeekBar = findViewById(R.id.bassBoostSeekBar)
 
         setupEqualizer(audioSessionId)

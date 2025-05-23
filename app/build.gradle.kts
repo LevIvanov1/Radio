@@ -84,10 +84,11 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.media3:media3-ui:1.0.0") // Замените на последнюю версию
-    implementation("androidx.media3:media3-exoplayer:1.0.0") // Замените на последнюю версию
-    implementation("androidx.media3:media3-common:1.0.0") // Замените на последнюю версию
-    implementation("androidx.media3:media3-effect:1.0.0")
+    implementation(libs.androidx.media3.ui) // Замените на последнюю версию
+    implementation("androidx.media3:media3-exoplayer:1.6.1") // Замените на последнюю версию
+    implementation("androidx.media3:media3-common:1.6.1") // Замените на последнюю версию
+    implementation("androidx.media3:media3-effect:1.6.1")
     implementation("androidx.media3:media3-ui:1.1.1") // Или последнюю версию
     implementation("androidx.media3:media3-session:1.1.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0-alpha02")
 }

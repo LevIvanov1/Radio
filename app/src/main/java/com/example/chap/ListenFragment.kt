@@ -13,13 +13,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.IOException
@@ -33,14 +29,23 @@ class ListenFragment : Fragment() {
     private var musicService: MusicService? = null
     private var isServiceBound = false
     private var currentStationIndex = 0
-    private var isPlaying = false
+
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as MusicService.MusicBinder
             musicService = binder.getService()
+
+            // Передаем список станций в MusicService
+            musicService?.setRadioStations(radioStations)
+
+            // Наблюдаем за изменением состояния воспроизведения
+            musicService?.getIsPlayingLiveData()?.observe(viewLifecycleOwner, Observer { isPlaying ->
+                updatePlayPauseButton(isPlaying)
+            })
+
             isServiceBound = true
-            updatePlayPauseButton()
+            updatePlayPauseButton() // Первоначальное обновление кнопки
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -85,14 +90,15 @@ class ListenFragment : Fragment() {
 
         playPauseButton.setOnClickListener {
             if (isServiceBound && musicService != null) {
-                if (musicService!!.isPlaying()) {
-                    musicService?.pause()
+                val isPlaying = musicService?.isPlaying() ?: false // Получаем текущее состояние из сервиса
+                if (isPlaying) {
+                    musicService?.pauseRadio()
                 } else {
                     if (radioStations.isNotEmpty()) {
                         musicService?.setStation(radioStations[currentStationIndex])
                     }
                 }
-                updatePlayPauseButton()
+                //updatePlayPauseButton(isPlaying) // Обновление произойдет через LiveData
             } else {
                 Log.w("ListenFragment", "Service not bound yet")
             }
@@ -103,55 +109,8 @@ class ListenFragment : Fragment() {
                 currentStationIndex = position
                 if (isServiceBound && radioStations.isNotEmpty()) {
                     musicService?.setStation(radioStations[position])
-                    updatePlayPauseButton()
+                    //updatePlayPauseButton() // Обновление произойдет через LiveData
                 }
-            }
-        })
-    }
-
-    private fun initializePlayer(streamUrl: String) {
-        val player = ExoPlayer.Builder(requireContext()).build() // Изменено на val
-        //val mediaItem = MediaItem.fromUri(streamUrl.toUri())
-        val mediaItem = MediaItem.Builder().setUri(streamUrl.toUri()).build() // Более новый способ создания MediaItem
-        player.setMediaItem(mediaItem)
-
-        player.prepare()
-        player.play()
-        isPlaying = true
-        playPauseButton.text = "Pause"
-
-        player.addListener(object : Player.Listener {
-            override fun onEvents(player: Player, events: Player.Events) {
-                if (events.contains(Player.EVENT_PLAYBACK_STATE_CHANGED)) {
-                    when (player.playbackState) {
-                        Player.STATE_IDLE -> {
-                            isPlaying = false
-                            playPauseButton.text = "Play"
-                        }
-                        Player.STATE_ENDED -> {
-                            isPlaying = false
-                            playPauseButton.text = "Play"
-                        }
-                        Player.STATE_READY -> {
-                            // Player is ready to play
-                        }
-                        Player.STATE_BUFFERING -> {
-                            // Player is buffering
-                        }
-                    }
-                }
-                if (events.contains(Player.EVENT_PLAYER_ERROR)) {
-                    Log.e("ExoPlayer", "Playback error: ${player.playerError}")
-                    isPlaying = false
-                    playPauseButton.text = "Play"
-                }
-            }
-
-            // Добавляем обработку ошибок
-            override fun onPlayerError(error: PlaybackException) {
-                Log.e("ExoPlayer", "Playback error: ${error.message}, error code: ${error.errorCodeName}")
-                isPlaying = false
-                playPauseButton.text = "Play"
             }
         })
     }
@@ -159,14 +118,14 @@ class ListenFragment : Fragment() {
 
     private fun releasePlayer() {
         if (isServiceBound) {
-            musicService?.pause()
-            updatePlayPauseButton()
+            musicService?.pauseRadio()
+            //updatePlayPauseButton() // Обновление произойдет через LiveData
         }
     }
 
-    private fun updatePlayPauseButton() {
+    private fun updatePlayPauseButton(isPlaying: Boolean = false) {
         if (isServiceBound && musicService != null) {
-            isPlaying = musicService!!.isPlaying()
+            //isPlaying = musicService!!.isPlaying() // Получаем состояние из сервиса
             playPauseButton.text = if (isPlaying) "Pause" else "Play"
         } else {
             playPauseButton.text = "Play"
