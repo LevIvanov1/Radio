@@ -14,12 +14,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.IOException
-import java.nio.charset.Charset
 
 class ListenFragment : Fragment() {
 
@@ -30,22 +28,13 @@ class ListenFragment : Fragment() {
     private var isServiceBound = false
     private var currentStationIndex = 0
 
-
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as MusicService.MusicBinder
             musicService = binder.getService()
-
-            // Передаем список станций в MusicService
             musicService?.setRadioStations(radioStations)
-
-            // Наблюдаем за изменением состояния воспроизведения
-            musicService?.getIsPlayingLiveData()?.observe(viewLifecycleOwner, Observer { isPlaying ->
-                updatePlayPauseButton(isPlaying)
-            })
-
             isServiceBound = true
-            updatePlayPauseButton() // Первоначальное обновление кнопки
+            updatePlayPauseButton(musicService?.isPlaying() ?: false)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -77,7 +66,7 @@ class ListenFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_listen, container, false)
         viewPager = view.findViewById(R.id.viewPager)
         playPauseButton = view.findViewById(R.id.playPauseButton)
-        radioStations = loadRadioStationsFromAssets() // Call the function here
+        radioStations = loadRadioStationsFromAssets()
 
         val adapter = RadioPagerAdapter(radioStations)
         viewPager.adapter = adapter
@@ -90,7 +79,7 @@ class ListenFragment : Fragment() {
 
         playPauseButton.setOnClickListener {
             if (isServiceBound && musicService != null) {
-                val isPlaying = musicService?.isPlaying() ?: false // Получаем текущее состояние из сервиса
+                val isPlaying = musicService?.isPlaying() ?: false
                 if (isPlaying) {
                     musicService?.pauseRadio()
                 } else {
@@ -98,7 +87,6 @@ class ListenFragment : Fragment() {
                         musicService?.setStation(radioStations[currentStationIndex])
                     }
                 }
-                //updatePlayPauseButton(isPlaying) // Обновление произойдет через LiveData
             } else {
                 Log.w("ListenFragment", "Service not bound yet")
             }
@@ -109,23 +97,22 @@ class ListenFragment : Fragment() {
                 currentStationIndex = position
                 if (isServiceBound && radioStations.isNotEmpty()) {
                     musicService?.setStation(radioStations[position])
-                    //updatePlayPauseButton() // Обновление произойдет через LiveData
                 }
             }
         })
+        musicService?.getIsPlayingLiveData()?.observe(viewLifecycleOwner) { isPlaying ->
+            updatePlayPauseButton(isPlaying)
+        }
     }
-
 
     private fun releasePlayer() {
         if (isServiceBound) {
             musicService?.pauseRadio()
-            //updatePlayPauseButton() // Обновление произойдет через LiveData
         }
     }
 
     private fun updatePlayPauseButton(isPlaying: Boolean = false) {
         if (isServiceBound && musicService != null) {
-            //isPlaying = musicService!!.isPlaying() // Получаем состояние из сервиса
             playPauseButton.text = if (isPlaying) "Pause" else "Play"
         } else {
             playPauseButton.text = "Play"
@@ -139,7 +126,7 @@ class ListenFragment : Fragment() {
             val buffer = ByteArray(size)
             inputStream.read(buffer)
             inputStream.close()
-            String(buffer, Charset.forName("UTF-8"))
+            String(buffer, Charsets.UTF_8)
         } catch (e: IOException) {
             e.printStackTrace()
             Log.e("ListenFragment", "Error reading stations.json: ${e.message}")

@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var sharedPreferences: SharedPreferences
     var musicService: MusicService? = null
-        private set  // Сделаем сеттер приватным
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -43,7 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigationView.setupWithNavController(navController)
 
-        // Запускаем MusicService
         Intent(this, MusicService::class.java).also { intent ->
             startService(intent)
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
@@ -53,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unbindService(serviceConnection) // Отвязываем сервис
+        unbindService(serviceConnection)
     }
 
 

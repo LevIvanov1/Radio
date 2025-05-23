@@ -60,7 +60,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         return START_STICKY
     }
 
-    //region Audio Focus
     private fun requestAudioFocus(): Boolean {
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -100,32 +99,26 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
                 stopRadio()
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                // временная потеря фокуса. Pause playback
                 pauseRadio()
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
-                // Lower the volume
                 if (player?.isPlaying == true) {
                     player?.volume = 0.1f
                 }
             }
         }
     }
-    //endregion
 
-    //region ExoPlayer Management
     fun initializePlayer() {
         player = ExoPlayer.Builder(this).build().apply {
             addListener(playerListener)
         }
 
-        // Получаем audioSessionId сразу после создания плеера
         val audioSessionId = player?.audioSessionId
         Log.d("Equalizer", "AudioSessionId in initializePlayer: $audioSessionId")
         audioSessionIdLiveData.postValue(audioSessionId)
     }
 
-    // Изменено: Доступ public
     fun playRadio() {
         if (currentStation == null) {
             Log.w(TAG, "No station to play")
@@ -153,7 +146,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         updateNotification()
     }
 
-    // Изменено: Доступ public
     fun pauseRadio() {
         player?.pause()
         isPlayingLiveData.postValue(false)
@@ -172,7 +164,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         stopSelf()
     }
 
-    // Изменено: Доступ public
     fun setStation(station: RadioStation) {
         currentStation = station
         playRadio()
@@ -185,9 +176,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     fun isPlaying(): Boolean {
         return player?.isPlaying ?: false
     }
-    //endregion
 
-    //region Station Switching
     private fun playNextStation() {
         if (radioStations.isNotEmpty()) {
             currentStationIndex = (currentStationIndex + 1) % radioStations.size
@@ -201,9 +190,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
             setStation(radioStations[currentStationIndex])
         }
     }
-    //endregion
 
-    //region Notification Management
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val serviceChannel = NotificationChannel(
@@ -245,7 +232,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2))
             .setOngoing(true)
-            .setContentIntent(createContentIntent()) // Добавляем content intent
+            .setContentIntent(createContentIntent())
             .build()
     }
 
@@ -266,9 +253,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         val notification = createNotification()
         startForeground(NOTIFICATION_ID, notification)
     }
-    //endregion
 
-    //region Listeners
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             when (playbackState) {
@@ -281,10 +266,8 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
                     updateNotification()
                 }
                 Player.STATE_READY -> {
-                    // Player is ready to play
                 }
                 Player.STATE_BUFFERING -> {
-                    // Player is buffering
                 }
             }
         }
@@ -307,7 +290,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         player?.release()
         player = null
     }
-    //endregion
 
     companion object {
         private const val TAG = "MusicService"
@@ -320,7 +302,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         const val ACTION_STOP = "com.example.chap.ACTION_STOP"
     }
 
-    //region Getters for LiveData
     fun getIsPlayingLiveData(): MutableLiveData<Boolean> {
         return isPlayingLiveData
     }
@@ -328,6 +309,5 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     fun getAudioSessionIdLiveData(): MutableLiveData<Int?> {
         return audioSessionIdLiveData
     }
-    //endregion
 }
 

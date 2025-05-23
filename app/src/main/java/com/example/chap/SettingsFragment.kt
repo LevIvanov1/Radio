@@ -23,7 +23,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             Log.d("Equalizer", "Starting Activity")
             try {
                 val intent = Intent(requireContext(), SettingsActivity::class.java)
-                intent.putExtra("start_equalizer", true) // Добавляем флаг
+                intent.putExtra("start_equalizer", true)
                 startActivity(intent)
             } catch (e: Exception) {
                 Log.e("Equalizer", "Error starting activity: ${e.message}")
@@ -45,9 +45,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == "theme_preference") {
-            // Получаем ссылку на MainActivity
             val activity = activity as? AppCompatActivity
-            // Пересоздаем MainActivity, чтобы применить изменения темы
             activity?.recreate()
         }
     }
@@ -62,7 +60,7 @@ class SettingsActivity : AppCompatActivity() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as MusicService.MusicBinder
             musicService = binder.getService()
-            isServiceBound = true // Устанавливаем isServiceBound в true
+            isServiceBound = true
 
             musicService?.getAudioSessionIdLiveData()?.observe(this@SettingsActivity) { audioSessionId ->
                 if (audioSessionId != null && audioSessionId != 0) {
@@ -94,7 +92,6 @@ class SettingsActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Привязываем MusicService
         Intent(this, MusicService::class.java).also { intent ->
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
             isServiceBound = true

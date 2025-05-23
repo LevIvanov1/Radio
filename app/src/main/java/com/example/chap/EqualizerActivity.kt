@@ -24,7 +24,6 @@ class EqualizerActivity : AppCompatActivity() {
         audioSessionId = intent.getIntExtra("audioSessionId", 0)
 
         if (audioSessionId == 0) {
-            // Обработка ошибки: Audio Session ID не предоставлен
             Log.e("Equalizer", "Audio Session ID not provided")
             finish()
             return
@@ -50,17 +49,16 @@ class EqualizerActivity : AppCompatActivity() {
             equalizer = Equalizer(0, audioSessionId)
             equalizer?.enabled = true
 
-            val bands = equalizer?.numberOfBands ?: 0 // Обработка возможного null
+            val bands = equalizer?.numberOfBands ?: 0
 
             if (bands < bandSeekBars.size) {
-                // Обработка ошибки: недостаточно ползунков
                 return
             }
 
-            val minEQLevel = equalizer?.bandLevelRange?.get(0) ?: 0 // Обработка возможного null
-            val maxEQLevel = equalizer?.bandLevelRange?.get(1) ?: 0 // Обработка возможного null
+            val minEQLevel = equalizer?.bandLevelRange?.get(0) ?: 0
+            val maxEQLevel = equalizer?.bandLevelRange?.get(1) ?: 0
 
-            for (i in 0 until bandSeekBars.size) { // Используем длину массива SeekBar
+            for (i in 0 until bandSeekBars.size) {
                 val band = i.toShort()
                 bandSeekBars[i].max = maxEQLevel - minEQLevel
                 bandSeekBars[i].progress = (equalizer?.getBandLevel(band) ?: 0) - minEQLevel
@@ -75,7 +73,7 @@ class EqualizerActivity : AppCompatActivity() {
                 })
             }
         } catch (e: Exception) {
-            e.printStackTrace() // Логируйте ошибку
+            e.printStackTrace()
         }
     }
 
@@ -83,15 +81,12 @@ class EqualizerActivity : AppCompatActivity() {
         try {
             bassBoost = BassBoost(0, audioSessionId)
             bassBoost?.enabled = true
-
-            bassBoostSeekBar.max = 1000 // Максимальное значение BassBoost
-
-            // Начинаем с нуля, так как не можем получить текущее значение
+            bassBoostSeekBar.max = 1000
             bassBoostSeekBar.progress = 0
 
             bassBoostSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    bassBoost?.setStrength(progress.toShort()) // Установка силы BassBoost
+                    bassBoost?.setStrength(progress.toShort())
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
