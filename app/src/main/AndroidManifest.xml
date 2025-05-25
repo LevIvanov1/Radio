@@ -33,8 +33,9 @@
             android:value=".SettingsFragment" />
 
         <activity
-            android:name=".SettingsActivity"
-            android:exported="false" />
+            android:name=".EqualizerHostActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:exported="false"/>
 
         <activity
             android:name=".MainActivity"

@@ -42,6 +42,10 @@ class EqualizerActivity : AppCompatActivity() {
 
         setupEqualizer(audioSessionId)
         setupBassBoost(audioSessionId)
+
+        resetButton.setOnClickListener {
+            resetEqualizer()
+        }
     }
 
     private fun setupEqualizer(audioSessionId: Int) {
@@ -95,6 +99,18 @@ class EqualizerActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun resetEqualizer() {
+        equalizer?.let { eq ->
+            for (i in 0 until bandSeekBars.size) {
+                val band = i.toShort()
+                eq.setBandLevel(band, 0)
+                bandSeekBars[i].progress = 0
+            }
+        }
+        bassBoost?.setStrength(0)
+        bassBoostSeekBar.progress = 0
     }
 
     override fun onDestroy() {

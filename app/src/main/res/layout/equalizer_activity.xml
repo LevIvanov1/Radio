@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:background="#FFFFFF">
-    
 
     <TextView
         android:layout_width="wrap_content"
@@ -13,30 +12,100 @@
         android:text="Equalizer"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
-    <SeekBar
-        android:id="@+id/band1SeekBar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-    <SeekBar
-        android:id="@+id/band2SeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/band1Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="60 Hz"
+            android:layout_weight="1"/>
 
-    <SeekBar
-        android:id="@+id/band3SeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <SeekBar
+            android:id="@+id/band1SeekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"/>
+    </LinearLayout>
 
-    <SeekBar
-        android:id="@+id/band4SeekBar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-    <SeekBar
-        android:id="@+id/band5SeekBar"
+        <TextView
+            android:id="@+id/band2Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="230 Hz"
+            android:layout_weight="1"/>
+
+        <SeekBar
+            android:id="@+id/band2SeekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/band3Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="910 Hz"
+            android:layout_weight="1"/>
+
+        <SeekBar
+            android:id="@+id/band3SeekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/band4Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3.6 kHz"
+            android:layout_weight="1"/>
+
+        <SeekBar
+            android:id="@+id/band4SeekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/band5Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="14 kHz"
+            android:layout_weight="1"/>
+
+        <SeekBar
+            android:id="@+id/band5SeekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"/>
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"

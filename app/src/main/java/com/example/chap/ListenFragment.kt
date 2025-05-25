@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -27,6 +28,15 @@ class ListenFragment : Fragment() {
     private var musicService: MusicService? = null
     private var isServiceBound = false
     private var currentStationIndex = 0
+    private var isViewCreated = false
+    private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            currentStationIndex = position
+            if (isServiceBound && radioStations.isNotEmpty()) {
+                musicService?.setStation(radioStations[position])
+            }
+        }
+    }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -34,7 +44,13 @@ class ListenFragment : Fragment() {
             musicService = binder.getService()
             musicService?.setRadioStations(radioStations)
             isServiceBound = true
-            updatePlayPauseButton(musicService?.isPlaying() ?: false)
+
+            if (isViewCreated) {
+                updatePlayPauseButton(musicService?.isPlaying() ?: false)
+                musicService?.getIsPlayingLiveData()?.observe(viewLifecycleOwner, Observer { isPlaying ->
+                    updatePlayPauseButton(isPlaying)
+                })
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -76,6 +92,7 @@ class ListenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        isViewCreated = true
 
         playPauseButton.setOnClickListener {
             if (isServiceBound && musicService != null) {
@@ -92,31 +109,23 @@ class ListenFragment : Fragment() {
             }
         }
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                currentStationIndex = position
-                if (isServiceBound && radioStations.isNotEmpty()) {
-                    musicService?.setStation(radioStations[position])
-                }
-            }
-        })
-        musicService?.getIsPlayingLiveData()?.observe(viewLifecycleOwner) { isPlaying ->
-            updatePlayPauseButton(isPlaying)
-        }
-    }
+        viewPager.registerOnPageChangeCallback(pageChangeCallback)
 
-    private fun releasePlayer() {
-        if (isServiceBound) {
-            musicService?.pauseRadio()
-        }
-    }
-
-    private fun updatePlayPauseButton(isPlaying: Boolean = false) {
         if (isServiceBound && musicService != null) {
-            playPauseButton.text = if (isPlaying) "Pause" else "Play"
-        } else {
-            playPauseButton.text = "Play"
+            musicService?.getIsPlayingLiveData()?.observe(viewLifecycleOwner, Observer { isPlaying ->
+                updatePlayPauseButton(isPlaying)
+            })
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        isViewCreated = false
+        viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
+    }
+
+    private fun updatePlayPauseButton(isPlaying: Boolean) {
+        playPauseButton.text = if (isPlaying) "Pause" else "Play"
     }
 
     private fun loadRadioStationsFromAssets(): List<RadioStation> {
@@ -135,10 +144,6 @@ class ListenFragment : Fragment() {
 
         val gson = Gson()
         val typeToken = object : TypeToken<List<RadioStation>>() {}.type
-        val stations = gson.fromJson<List<RadioStation>>(jsonString, typeToken)
-
-        Log.d("ListenFragment", "Loaded ${stations.size} radio stations")
-
-        return stations
+        return gson.fromJson<List<RadioStation>>(jsonString, typeToken)
     }
 }
