@@ -31,8 +31,8 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     private var audioManager: AudioManager? = null
     private var audioFocusRequest: AudioFocusRequest? = null
     private var isAudioFocusGranted = false
-    private var radioStations: List<RadioStation> = emptyList() // Список радиостанций
-    private var currentStationIndex = 0 // Индекс текущей станции
+    private var radioStations: List<RadioStation> = emptyList()
+    private var currentStationIndex = 0
 
     inner class MusicBinder : Binder() {
         fun getService(): MusicService = this@MusicService
@@ -94,7 +94,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
                 }
             }
             AudioManager.AUDIOFOCUS_LOSS -> {
-                // Permanent loss of focus
                 pauseRadio()
                 stopRadio()
             }
