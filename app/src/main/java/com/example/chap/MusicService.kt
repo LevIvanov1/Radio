@@ -17,6 +17,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
+import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -217,22 +218,38 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         val prevPendingIntent = PendingIntent.getService(this, 3, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val stopPendingIntent = PendingIntent.getService(this, 4, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
-        val playPauseIcon = if (isPlaying()) R.drawable.ic_pause else R.drawable.ic_play
+        val playPauseIcon = if (isPlaying()) R.drawable.ic_pause else R.drawable.ic_start
         val stationName = currentStation?.name ?: "Radio Station"
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(stationName)
             .setContentText("Playing...")
             .setSmallIcon(R.mipmap.ic_launcher)
-            .addAction(R.drawable.ic_prev, "Previous", prevPendingIntent)
+            .addAction(R.drawable.ic_cancel, "Previous", prevPendingIntent)
             .addAction(playPauseIcon, if (isPlaying()) "Pause" else "Play", if (isPlaying()) pausePendingIntent else playPendingIntent)
-            .addAction(R.drawable.ic_next, "Next", nextPendingIntent)
-            .addAction(R.drawable.ic_stop, "Stop", stopPendingIntent)
+            .addAction(R.drawable.ic_forward, "Next", nextPendingIntent)
+            .addAction(R.drawable.ic_close, "Stop", stopPendingIntent)
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2))
             .setOngoing(true)
             .setContentIntent(createContentIntent())
-            .build()
+
+        currentStation?.imageUrl?.let { imageUrl ->
+            try {
+                val futureTarget = Glide.with(this)
+                    .asBitmap()
+                    .load(imageUrl)
+                    .submit()
+
+                val bitmap = futureTarget.get()
+                notificationBuilder.setLargeIcon(bitmap)
+                futureTarget.cancel(false)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading notification image: ${e.message}")
+            }
+        }
+
+        return notificationBuilder.build()
     }
 
     private fun createContentIntent(): PendingIntent {
