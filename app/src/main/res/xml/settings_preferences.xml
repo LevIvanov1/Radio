@@ -16,7 +16,8 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Звук">
+        android:title="Звук"
+        >
 
         <Preference
             android:key="equalizer_preference"
