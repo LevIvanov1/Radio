@@ -88,7 +88,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     override fun onAudioFocusChange(focusChange: Int) {
         when (focusChange) {
             AudioManager.AUDIOFOCUS_GAIN -> {
-                // Resume playback
                 player?.volume = 1.0f
                 if (player?.isPlaying == false) {
                     playRadio()
@@ -115,28 +114,22 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         }
 
         val audioSessionId = player?.audioSessionId
-        Log.d("Equalizer", "AudioSessionId in initializePlayer: $audioSessionId")
         audioSessionIdLiveData.postValue(audioSessionId)
     }
 
     fun playRadio() {
         if (currentStation == null) {
-            Log.w(TAG, "No station to play")
             return
         }
-
         if (!requestAudioFocus()) {
-            Log.w(TAG, "Audio focus not granted")
             return
         }
-
         if (player == null) {
             initializePlayer()
         } else {
             player?.stop()
             player?.clearMediaItems()
         }
-
         val mediaItem = MediaItem.fromUri(currentStation!!.streamUrl)
         player?.setMediaItem(mediaItem)
         player?.prepare()
@@ -145,16 +138,13 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         startRadioForeground()
         updateNotification()
     }
-
     fun pauseRadio() {
         player?.pause()
         isPlayingLiveData.postValue(false)
         updateNotification()
     }
-
     private fun stopRadio() {
         abandonAudioFocus()
-
         player?.stop()
         player?.clearMediaItems()
         player?.release()

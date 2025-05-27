@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:text="Эквалайзер"
         android:textSize="24dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="20dp"
         android:fontFamily="@font/evolventa"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
