@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme.Pink" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/pink</item>
+        <item name="android:windowBackground">@drawable/bg_pink</item>
+    </style>
+
+    <style name="AppTheme.Coffee" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/coffee</item>
+        <item name="android:windowBackground">@drawable/coffee</item>
+    </style>
+
+        <style name="AppTheme.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+            <item name="colorPrimary">@color/black</item>
+            <item name="android:windowBackground">@drawable/light</item>
+        </style>
+
+        <style name="AppTheme.Red" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+            <item name="colorPrimary">@color/red_primary</item>
+            <item name="android:windowBackground">@drawable/red</item>
+        </style>
+
+        <style name="AppTheme.Blue" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+            <item name="colorPrimary">@color/blue_primary</item>
+            <item name="android:windowBackground">@drawable/blue</item>
+        </style>
+
+        <style name="AppTheme.Green" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+            <item name="colorPrimary">@color/green</item>
+            <item name="android:windowBackground">@drawable/green</item>
+        </style>
+
+        <style name="AppTheme.Orange" parent="Theme.MaterialComponents.Light.NoActionBar">
+            <item name="colorPrimary">@color/orange_primary</item>
+            <item name="android:windowBackground">@drawable/orange</item>
+        </style>
+
+        <style name="AppTheme.Purple" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+            <item name="colorPrimary">@color/purple_primary</item>
+            <item name="android:windowBackground">@drawable/purple</item>
+        </style>
+
+        <style name="AppTheme.Black" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+            <item name="colorPrimary">@color/black_primary</item>
+            <item name="android:windowBackground">@drawable/black</item>
+        </style>
+
+</resources>
