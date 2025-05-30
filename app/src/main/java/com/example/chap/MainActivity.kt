@@ -73,8 +73,14 @@ class MainActivity : AppCompatActivity() {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 setTheme(R.style.AppTheme_Pink)
             }
-            "orange" -> setTheme(R.style.AppTheme_Orange)
-            "black" -> setTheme(R.style.AppTheme_Black)
+            "orange" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                setTheme(R.style.AppTheme_Orange)
+            }
+            "black" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                setTheme(R.style.AppTheme_Black)
+            }
 
             else -> setTheme(R.style.AppTheme_Light)
         }

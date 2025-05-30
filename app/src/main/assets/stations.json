@@ -15,6 +15,11 @@
     "streamUrl": "https://dorognoe.hostingradio.ru/dorognoe"
   },
   {
+    "name": "Русское радио",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/rusradio.png",
+    "streamUrl": " https://rusradio.hostingradio.ru/rusradio96.aacp"
+  },
+  {
     "name": "Ретро FM 80-е",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/logo_rfm_80.png",
     "streamUrl": "https://retro80.hostingradio.ru:8025/retro80-128.mp3"
@@ -40,22 +45,22 @@
     "streamUrl": "https://listen8.myradio24.com/5129"
   },
   {
-    "name": "Japan Anime Songs»",
+    "name": "Japan Anime Songs",
     "imageUrl": "https://zeno.fm/_ipx/_/https://images.zeno.fm/9l05MRejzw1rHNDaVInyDTXZGoPTVk5GMXitCDQgWaE/rs:fill:288:288/g:ce:0:0/aHR0cHM6Ly9wcm94eS56ZW5vLmZtL2NvbnRlbnQvc3RhdGlvbnMvYWd4emZucGxibTh0YzNSaGRITnlNZ3NTQ2tGMWRHaERiR2xsYm5RWWdJQ1E0dkNldWdzTUN4SU9VM1JoZEdsdmJsQnliMlpwYkdVWWdJQ1F4ZG5MLUFvTW9nRUVlbVZ1YncvaW1hZ2UvP3U9MTcxNTczMTQ3MjAwMA.webp",
     "streamUrl": "https://stream-178.zeno.fm/e10726wdz4zuv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJlMTA3MjZ3ZHo0enV2IiwiaG9zdCI6InN0cmVhbS0xNzguemVuby5mbSIsInJ0dGwiOjUsImp0aSI6Ikd3X3FIOGE5UUpxX2JtQVF0UnlVQ0EiLCJpYXQiOjE3NDgyOTkzODMsImV4cCI6MTc0ODI5OTQ0M30.EeSYbK451i3j_nD_GASQM5wqD7W3jnNLpAuiN77NYlY"
   },
   {
-    "name": "Король и Шут»",
+    "name": "Король и Шут",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/korol-i-shut-101ru.jpg",
     "streamUrl": "https://pub0302.101.ru:8000/stream/pro/aac/64/191"
   },
   {
-    "name": "Виктор Цой и группа «КИНО»",
+    "name": "Виктор Цой и группа КИНО",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/kino-101.png",
     "streamUrl": "https://pub0202.101.ru:8443/stream/pro/aac/64/103?"
   },
   {
-    "name": "Modern Talking»",
+    "name": "Modern Talking",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/modern-talking-101ru.jpg",
     "streamUrl": "https://pub0201.101.ru:8443/stream/pro/aac/64/115"
   }

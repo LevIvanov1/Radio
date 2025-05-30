@@ -3,7 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/listenFragment">
+    app:startDestination="@id/radioListFragment">
+
+    <fragment
+        android:id="@+id/radioListFragment"
+        android:name="com.example.chap.RadioListFragment"
+        android:label="Radio Stations">
+        <action
+            android:id="@+id/action_radioListFragment_to_listenFragment"
+            app:destination="@id/listenFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/listenFragment"

@@ -32,7 +32,13 @@ class ListenFragment : Fragment() {
         override fun onPageSelected(position: Int) {
             currentStationIndex = position
             if (isServiceBound && radioStations.isNotEmpty()) {
-                musicService?.setStation(radioStations[position])
+                musicService?.let {
+                    if (it.isPlaying()) {
+                        it.changeStation(radioStations[position])
+                    } else {
+                        it.setStationWithoutPlay(radioStations[position])
+                    }
+                }
             }
         }
     }
@@ -95,16 +101,11 @@ class ListenFragment : Fragment() {
 
         playPauseButton.setOnClickListener {
             if (isServiceBound && musicService != null) {
-                val isPlaying = musicService?.isPlaying() ?: false
-                if (isPlaying) {
+                if (musicService?.isPlaying() == true) {
                     musicService?.pauseRadio()
                 } else {
-                    if (radioStations.isNotEmpty()) {
-                        musicService?.setStation(radioStations[currentStationIndex])
-                    }
+                    musicService?.setStation(radioStations[viewPager.currentItem])
                 }
-            } else {
-                Log.w("ListenFragment", "Service not bound yet")
             }
         }
 

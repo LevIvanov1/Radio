@@ -34,6 +34,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     private var isAudioFocusGranted = false
     private var radioStations: List<RadioStation> = emptyList()
     private var currentStationIndex = 0
+    fun getCurrentStation(): RadioStation? = currentStation
 
     inner class MusicBinder : Binder() {
         fun getService(): MusicService = this@MusicService
@@ -82,6 +83,22 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         if (isAudioFocusGranted) {
             audioManager?.abandonAudioFocusRequest(audioFocusRequest!!)
             isAudioFocusGranted = false
+        }
+    }
+
+    fun setStationWithoutPlay(station: RadioStation) {
+        currentStation = station
+    }
+
+    fun changeStation(station: RadioStation) {
+        currentStation = station
+        if (isPlaying()) {
+            player?.stop()
+            player?.clearMediaItems()
+            val mediaItem = MediaItem.fromUri(station.streamUrl)
+            player?.setMediaItem(mediaItem)
+            player?.prepare()
+            player?.play()
         }
     }
 
