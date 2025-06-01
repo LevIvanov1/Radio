@@ -226,15 +226,14 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         val stopPendingIntent = PendingIntent.getService(this, 4, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val playPauseIcon = if (isPlaying()) R.drawable.ic_pause else R.drawable.ic_start
-        val stationName = currentStation?.name ?: "Radio Station"
 
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(stationName)
-            .setContentText("Playing...")
+            .setContentTitle(currentStation?.name ?: "Radio Station")
+            .setContentText(if (isPlaying()) "Воспроизводится" else "На паузе")
             .setSmallIcon(R.mipmap.ic_launcher)
-            .addAction(R.drawable.ic_cancel, "Previous", prevPendingIntent)
+            .addAction(androidx.media3.session.R.drawable.media3_icon_previous, "Previous", prevPendingIntent)
             .addAction(playPauseIcon, if (isPlaying()) "Pause" else "Play", if (isPlaying()) pausePendingIntent else playPendingIntent)
-            .addAction(R.drawable.ic_forward, "Next", nextPendingIntent)
+            .addAction(androidx.media3.session.R.drawable.media3_icon_next, "Next", nextPendingIntent)
             .addAction(R.drawable.ic_close, "Stop", stopPendingIntent)
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2))

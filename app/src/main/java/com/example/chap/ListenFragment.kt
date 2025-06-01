@@ -98,7 +98,9 @@ class ListenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         isViewCreated = true
-
+        val startPosition = arguments?.getInt("SELECTED_POSITION", 0) ?: 0
+        currentStationIndex = startPosition
+        viewPager.setCurrentItem(startPosition, false)
         playPauseButton.setOnClickListener {
             if (isServiceBound && musicService != null) {
                 if (musicService?.isPlaying() == true) {

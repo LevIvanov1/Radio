@@ -70,9 +70,26 @@ class RadioListFragment : Fragment() {
     private fun setupRecyclerView() {
         val stations = viewModel.getRadioStations()
         recyclerView.adapter = RadioListAdapter(stations, { position ->
+            val selectedStation = stations[position]
             viewModel.setCurrentStationIndex(position)
-            musicService?.setStationWithoutPlay(stations[position]) // Всегда без автозапуска
-            findNavController().navigate(R.id.action_radioListFragment_to_listenFragment)
+
+            musicService?.let { service ->
+                val isSameStationPlaying = service.isPlaying() &&
+                        service.getCurrentStation()?.streamUrl == selectedStation.streamUrl
+
+                if (!isSameStationPlaying) {
+                    if (service.isPlaying()) {
+                        service.changeStation(selectedStation)
+                    } else {
+                        service.setStationWithoutPlay(selectedStation)
+                    }
+                }
+            }
+
+            findNavController().navigate(
+                R.id.action_radioListFragment_to_listenFragment,
+                Bundle().apply { putInt("SELECTED_POSITION", position) }
+            )
         }, musicService)
 
         musicService?.getIsPlayingLiveData()?.observe(viewLifecycleOwner) { _ ->
