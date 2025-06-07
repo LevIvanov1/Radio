@@ -8,7 +8,8 @@
     <fragment
         android:id="@+id/radioListFragment"
         android:name="com.example.chap.RadioListFragment"
-        android:label="Radio Stations">
+        tools:layout="@layout/fragment_radio_list"
+        android:label="Радио">
         <action
             android:id="@+id/action_radioListFragment_to_listenFragment"
             app:destination="@id/listenFragment" />
@@ -24,4 +25,8 @@
         android:name="com.example.chap.SettingsFragment"
         android:label="SettingsFragment"
         tools:layout="@layout/fragment_settings"/>
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="com.example.chap.StatsFragment"
+        android:label="StatsFragment" />
 </navigation>

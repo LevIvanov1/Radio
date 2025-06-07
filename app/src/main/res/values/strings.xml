@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Radio</string>
+    <string name="stats">Статистика</string>
+    <string name="sleep_timer">Таймер сна</string>
 </resources>

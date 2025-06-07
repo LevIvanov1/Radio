@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                 setTheme(R.style.AppTheme_Red)
             }
             "blue" -> {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 setTheme(R.style.AppTheme_Blue)
             }
             "purple"  -> {
@@ -113,4 +113,3 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
     }
 }
-

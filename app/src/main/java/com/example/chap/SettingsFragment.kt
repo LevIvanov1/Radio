@@ -14,6 +14,20 @@ import androidx.preference.PreferenceFragmentCompat
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var equalizerLaunched = false
+    private var musicService: MusicService? = null
+    private var isServiceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            musicService = (service as MusicService.MusicBinder).getService()
+            isServiceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            musicService = null
+            isServiceBound = false
+        }
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_preferences, rootKey)
@@ -25,8 +39,32 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             }
             true
         }
+
+        findPreference<Preference>("sleep_timer_preference")?.setOnPreferenceClickListener {
+            SleepTimerDialogFragment { duration ->
+                musicService?.setSleepTimer(duration)
+                val message = if (duration > 0) "Таймер сна установлен" else "Таймер сна выключен"
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            }.show(childFragmentManager, "SleepTimerDialog")
+            true
+        }
     }
 
+    override fun onStart() {
+        super.onStart()
+        Intent(requireContext(), MusicService::class.java).also { intent ->
+            requireContext().bindService(intent, serviceConnection, android.content.Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (isServiceBound) {
+            requireContext().unbindService(serviceConnection)
+            isServiceBound = false
+            musicService = null
+        }
+    }
     override fun onResume() {
         super.onResume()
         equalizerLaunched = false
