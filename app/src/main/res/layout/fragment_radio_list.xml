@@ -1,20 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
     android:layout_marginTop="30dp"
-    android:layout_marginBottom="100dp"
-    android:layout_height="match_parent">
-
+    android:layout_marginBottom="60dp"
+    android:padding="8dp">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/radioRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:listitem="@layout/radio_list_item" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="4dp">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:queryHint="Поиск радиостанций" />
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>
