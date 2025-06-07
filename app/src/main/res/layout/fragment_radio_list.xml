@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_marginTop="30dp"
-    android:layout_marginBottom="60dp"
+    android:layout_marginBottom="95dp"
     android:padding="8dp">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -16,19 +16,14 @@
         android:layout_weight="1"
         tools:listitem="@layout/radio_list_item" />
 
-    <androidx.cardview.widget.CardView
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="4dp">
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:queryHint="Поиск радиостанций" />
-    </androidx.cardview.widget.CardView>
-
+        android:background="@drawable/search_view_background"
+        android:queryHint="Поиск"
+        app:iconifiedByDefault="false"
+        app:queryBackground="@android:color/transparent"
+        android:elevation="4dp"
+        android:layout_margin="8dp"/>
 </LinearLayout>
