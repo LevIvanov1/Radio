@@ -138,14 +138,100 @@
     <SeekBar
         android:id="@+id/bassBoostSeekBar"
         android:layout_width="match_parent"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/buttonReset"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/evolventa"
-        android:text="Сбросить" />
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:weightSum="3"
+        android:baselineAligned="false">
+
+        <Button
+            android:id="@+id/buttonHighs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Больше высоких"
+            android:fontFamily="@font/evolventa"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"/>
+
+        <Button
+            android:id="@+id/buttonLows"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Больше низких"
+            android:fontFamily="@font/evolventa"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"/>
+
+        <Button
+            android:id="@+id/buttonClear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Чистый"
+            android:fontFamily="@font/evolventa"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:baselineAligned="false">
+
+        <Button
+            android:id="@+id/buttonSmooth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Гладкий"
+            android:fontFamily="@font/evolventa"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"/>
+
+        <Button
+            android:id="@+id/buttonDynamic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Динамичный"
+            android:fontFamily="@font/evolventa"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"/>
+
+        <Button
+            android:id="@+id/buttonStandard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Стандартный"
+            android:fontFamily="@font/evolventa"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"/>
+    </LinearLayout>
 
 </LinearLayout>

@@ -354,7 +354,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         return audioSessionIdLiveData
     }
 
-    // Таймер сна
     fun setSleepTimer(duration: Long) {
         sleepTimer?.cancel()
         sleepTimerDuration = duration
@@ -370,7 +369,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         }
     }
 
-    // Статистика
     private fun startTrackingTime() {
         startTime = System.currentTimeMillis()
     }

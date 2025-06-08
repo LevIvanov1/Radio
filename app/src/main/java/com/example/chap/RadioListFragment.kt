@@ -92,21 +92,22 @@ class RadioListFragment : Fragment() {
     }
 
     private fun setupRecyclerView(stations: List<RadioStation>) {
-        // Сохраняем список станций в поле класса
         radioStations = stations
 
         val adapter = RadioListAdapter(
             originalStations = stations,
-            onItemClick = { clickedStation ->
-                val originalPosition = radioStations.indexOfFirst { station ->
-                    station.streamUrl == clickedStation.streamUrl
+            onPlayPauseClick = { clickedStation ->
+                val service = musicService // Copy to a local variable
+                if (service?.isPlaying() == true && service.getCurrentStation()?.streamUrl == clickedStation.streamUrl) {
+                    service.pauseRadio()
+                } else {
+                    service?.setStation(clickedStation)
                 }
-
+            },
+            onItemClick = { clickedStation ->
+                val originalPosition = radioStations.indexOf(clickedStation)
                 if (originalPosition != -1) {
                     viewModel.setCurrentStationIndex(originalPosition)
-
-                    musicService?.setStationWithoutPlay(clickedStation)
-
                     findNavController().navigate(
                         R.id.action_radioListFragment_to_listenFragment,
                         Bundle().apply { putInt("SELECTED_POSITION", originalPosition) }
@@ -153,6 +154,7 @@ class RadioListFragment : Fragment() {
 
 class RadioListAdapter(
     private var originalStations: List<RadioStation>,
+    private val onPlayPauseClick: (RadioStation) -> Unit,
     private val onItemClick: (RadioStation) -> Unit,
     private val musicService: MusicService?
 ) : RecyclerView.Adapter<RadioListAdapter.RadioViewHolder>() {
@@ -194,26 +196,19 @@ class RadioListAdapter(
             .load(station.imageUrl)
             .into(holder.imageView)
 
-        // Проверка, играет ли текущая станция
-        val isPlaying = musicService?.let {
-            it.isPlaying() && it.getCurrentStation()?.streamUrl == station.streamUrl
-        } ?: false
+        val isPlaying = musicService?.isPlaying() == true && musicService.getCurrentStation()?.streamUrl == station.streamUrl
 
         holder.playButton.setImageResource(
             if (isPlaying) R.drawable.ic_pause else androidx.media3.session.R.drawable.media3_icon_play
         )
 
-        holder.itemView.setOnClickListener {
-            onItemClick(station)
+        holder.playButton.setOnClickListener {
+            onPlayPauseClick(station)
+            notifyDataSetChanged()
         }
 
-        holder.playButton.setOnClickListener {
-            if (isPlaying) {
-                musicService?.pauseRadio()
-            } else {
-                onItemClick(station)
-            }
-            notifyDataSetChanged()
+        holder.itemView.setOnClickListener {
+            onItemClick(station)
         }
     }
 

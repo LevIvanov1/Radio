@@ -15,7 +15,15 @@ class EqualizerActivity : AppCompatActivity() {
     private var audioSessionId = 0
     private lateinit var bassBoostSeekBar: SeekBar
     private lateinit var bandSeekBars: List<SeekBar>
-    private lateinit var resetButton: Button
+    private lateinit var buttonHighs: Button
+    private lateinit var buttonLows: Button
+    private lateinit var buttonClear: Button
+    private lateinit var buttonSmooth: Button
+    private lateinit var buttonDynamic: Button
+    private lateinit var buttonStandard: Button
+
+    private val initialBandLevels = mutableListOf<Short>()
+    private var initialBassBoostStrength: Short = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,15 +45,26 @@ class EqualizerActivity : AppCompatActivity() {
             findViewById(R.id.band5SeekBar)
         )
 
-        resetButton = findViewById(R.id.buttonReset)
         bassBoostSeekBar = findViewById(R.id.bassBoostSeekBar)
+        buttonHighs = findViewById(R.id.buttonHighs)
+        buttonLows = findViewById(R.id.buttonLows)
+        buttonClear = findViewById(R.id.buttonClear)
+        buttonSmooth = findViewById(R.id.buttonSmooth)
+        buttonDynamic = findViewById(R.id.buttonDynamic)
+        buttonStandard = findViewById(R.id.buttonStandard)
 
         setupEqualizer(audioSessionId)
         setupBassBoost(audioSessionId)
+        setupPresetButtons()
+    }
 
-        resetButton.setOnClickListener {
-            resetEqualizer()
-        }
+    private fun setupPresetButtons() {
+        buttonHighs.setOnClickListener { applyHighsPreset() }
+        buttonLows.setOnClickListener { applyLowsPreset() }
+        buttonClear.setOnClickListener { applyClearPreset() }
+        buttonSmooth.setOnClickListener { applySmoothPreset() }
+        buttonDynamic.setOnClickListener { applyDynamicPreset() }
+        buttonStandard.setOnClickListener { applyStandardPreset() }
     }
 
     private fun setupEqualizer(audioSessionId: Int) {
@@ -61,6 +80,12 @@ class EqualizerActivity : AppCompatActivity() {
 
             val minEQLevel = equalizer?.bandLevelRange?.get(0) ?: 0
             val maxEQLevel = equalizer?.bandLevelRange?.get(1) ?: 0
+
+            // Сохраняем начальные значения
+            for (i in 0 until bandSeekBars.size) {
+                val band = i.toShort()
+                initialBandLevels.add(equalizer?.getBandLevel(band) ?: 0)
+            }
 
             for (i in 0 until bandSeekBars.size) {
                 val band = i.toShort()
@@ -88,6 +113,8 @@ class EqualizerActivity : AppCompatActivity() {
             bassBoostSeekBar.max = 1000
             bassBoostSeekBar.progress = 0
 
+            initialBassBoostStrength = 0
+
             bassBoostSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     bassBoost?.setStrength(progress.toShort())
@@ -101,16 +128,91 @@ class EqualizerActivity : AppCompatActivity() {
         }
     }
 
-    private fun resetEqualizer() {
+    private fun applyHighsPreset() {
         equalizer?.let { eq ->
-            for (i in 0 until bandSeekBars.size) {
-                val band = i.toShort()
-                eq.setBandLevel(band, 0)
-                bandSeekBars[i].progress = 0
-            }
+            eq.setBandLevel(0, 0)
+            eq.setBandLevel(1, 0)
+            eq.setBandLevel(2, 0)
+            eq.setBandLevel(3, 1000)
+            eq.setBandLevel(4, 1500)
+            updateSeekBars()
         }
         bassBoost?.setStrength(0)
         bassBoostSeekBar.progress = 0
+    }
+
+    private fun applyLowsPreset() {
+        equalizer?.let { eq ->
+            eq.setBandLevel(0, 1500)
+            eq.setBandLevel(1, 1000)
+            eq.setBandLevel(2, 0)
+            eq.setBandLevel(3, 0)
+            eq.setBandLevel(4, 0)
+            updateSeekBars()
+        }
+        bassBoost?.setStrength(500)
+        bassBoostSeekBar.progress = 500
+    }
+
+    private fun applyClearPreset() {
+        equalizer?.let { eq ->
+            eq.setBandLevel(0, 0)
+            eq.setBandLevel(1, 0)
+            eq.setBandLevel(2, 500)
+            eq.setBandLevel(3, 0)
+            eq.setBandLevel(4, 0)
+            updateSeekBars()
+        }
+        bassBoost?.setStrength(0)
+        bassBoostSeekBar.progress = 0
+    }
+
+    private fun applySmoothPreset() {
+        equalizer?.let { eq ->
+            eq.setBandLevel(0, 500)
+            eq.setBandLevel(1, 500)
+            eq.setBandLevel(2, 500)
+            eq.setBandLevel(3, 500)
+            eq.setBandLevel(4, 500)
+            updateSeekBars()
+        }
+        bassBoost?.setStrength(200)
+        bassBoostSeekBar.progress = 200
+    }
+
+    private fun applyDynamicPreset() {
+        equalizer?.let { eq ->
+            eq.setBandLevel(0, 1000)
+            eq.setBandLevel(1, 500)
+            eq.setBandLevel(2, 0)
+            eq.setBandLevel(3, 500)
+            eq.setBandLevel(4, 1000)
+            updateSeekBars()
+        }
+        bassBoost?.setStrength(300)
+        bassBoostSeekBar.progress = 300
+    }
+
+    private fun applyStandardPreset() {
+        equalizer?.let { eq ->
+            for (i in 0 until bandSeekBars.size) {
+                val band = i.toShort()
+                eq.setBandLevel(band, initialBandLevels[i])
+            }
+            updateSeekBars()
+        }
+        bassBoost?.setStrength(initialBassBoostStrength)
+        bassBoostSeekBar.progress = initialBassBoostStrength.toInt()
+    }
+
+    private fun updateSeekBars() {
+        equalizer?.let { eq ->
+            val minEQLevel = eq.bandLevelRange[0]
+            for (i in 0 until bandSeekBars.size) {
+                val band = i.toShort()
+                bandSeekBars[i].progress = eq.getBandLevel(band) - minEQLevel
+            }
+        }
     }
 
     override fun onDestroy() {
