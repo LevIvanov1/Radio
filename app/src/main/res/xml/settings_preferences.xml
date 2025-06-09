@@ -25,14 +25,4 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Другое">
-
-        <Preference
-            android:key="sleep_timer_preference"
-            android:title="Таймер сна"
-            android:summary="Установите таймер сна" />
-
-    </PreferenceCategory>
-
 </PreferenceScreen>

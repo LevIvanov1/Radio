@@ -113,6 +113,7 @@ class EqualizerActivity : AppCompatActivity() {
             bassBoostSeekBar.max = 1000
             bassBoostSeekBar.progress = 0
 
+            // Сохраняем начальное значение бас-буста (по умолчанию 0)
             initialBassBoostStrength = 0
 
             bassBoostSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -130,11 +131,11 @@ class EqualizerActivity : AppCompatActivity() {
 
     private fun applyHighsPreset() {
         equalizer?.let { eq ->
-            eq.setBandLevel(0, 0)
-            eq.setBandLevel(1, 0)
-            eq.setBandLevel(2, 0)
-            eq.setBandLevel(3, 1000)
-            eq.setBandLevel(4, 1500)
+            eq.setBandLevel(0, 0) // 60 Hz
+            eq.setBandLevel(1, 0) // 230 Hz
+            eq.setBandLevel(2, 0) // 910 Hz
+            eq.setBandLevel(3, 1000) // 3.6 kHz
+            eq.setBandLevel(4, 1500) // 14 kHz
             updateSeekBars()
         }
         bassBoost?.setStrength(0)
@@ -143,11 +144,11 @@ class EqualizerActivity : AppCompatActivity() {
 
     private fun applyLowsPreset() {
         equalizer?.let { eq ->
-            eq.setBandLevel(0, 1500)
-            eq.setBandLevel(1, 1000)
-            eq.setBandLevel(2, 0)
-            eq.setBandLevel(3, 0)
-            eq.setBandLevel(4, 0)
+            eq.setBandLevel(0, 1500) // 60 Hz
+            eq.setBandLevel(1, 1000) // 230 Hz
+            eq.setBandLevel(2, 0) // 910 Hz
+            eq.setBandLevel(3, 0) // 3.6 kHz
+            eq.setBandLevel(4, 0) // 14 kHz
             updateSeekBars()
         }
         bassBoost?.setStrength(500)
@@ -156,11 +157,11 @@ class EqualizerActivity : AppCompatActivity() {
 
     private fun applyClearPreset() {
         equalizer?.let { eq ->
-            eq.setBandLevel(0, 0)
-            eq.setBandLevel(1, 0)
-            eq.setBandLevel(2, 500)
-            eq.setBandLevel(3, 0)
-            eq.setBandLevel(4, 0)
+            eq.setBandLevel(0, 0) // 60 Hz
+            eq.setBandLevel(1, 0) // 230 Hz
+            eq.setBandLevel(2, 500) // 910 Hz
+            eq.setBandLevel(3, 0) // 3.6 kHz
+            eq.setBandLevel(4, 0) // 14 kHz
             updateSeekBars()
         }
         bassBoost?.setStrength(0)
@@ -169,11 +170,11 @@ class EqualizerActivity : AppCompatActivity() {
 
     private fun applySmoothPreset() {
         equalizer?.let { eq ->
-            eq.setBandLevel(0, 500)
-            eq.setBandLevel(1, 500)
-            eq.setBandLevel(2, 500)
-            eq.setBandLevel(3, 500)
-            eq.setBandLevel(4, 500)
+            eq.setBandLevel(0, 500) // 60 Hz
+            eq.setBandLevel(1, 500) // 230 Hz
+            eq.setBandLevel(2, 500) // 910 Hz
+            eq.setBandLevel(3, 500) // 3.6 kHz
+            eq.setBandLevel(4, 500) // 14 kHz
             updateSeekBars()
         }
         bassBoost?.setStrength(200)
@@ -182,11 +183,11 @@ class EqualizerActivity : AppCompatActivity() {
 
     private fun applyDynamicPreset() {
         equalizer?.let { eq ->
-            eq.setBandLevel(0, 1000)
-            eq.setBandLevel(1, 500)
-            eq.setBandLevel(2, 0)
-            eq.setBandLevel(3, 500)
-            eq.setBandLevel(4, 1000)
+            eq.setBandLevel(0, 1000) // 60 Hz
+            eq.setBandLevel(1, 500) // 230 Hz
+            eq.setBandLevel(2, 0) // 910 Hz
+            eq.setBandLevel(3, 500) // 3.6 kHz
+            eq.setBandLevel(4, 1000) // 14 kHz
             updateSeekBars()
         }
         bassBoost?.setStrength(300)
@@ -195,6 +196,7 @@ class EqualizerActivity : AppCompatActivity() {
 
     private fun applyStandardPreset() {
         equalizer?.let { eq ->
+            // Восстанавливаем начальные значения
             for (i in 0 until bandSeekBars.size) {
                 val band = i.toShort()
                 eq.setBandLevel(band, initialBandLevels[i])

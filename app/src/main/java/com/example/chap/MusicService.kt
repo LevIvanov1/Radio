@@ -1,4 +1,3 @@
-
 package com.example.chap
 
 import RadioStation
@@ -9,13 +8,11 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Binder
 import android.os.Build
-import android.os.CountDownTimer
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -24,7 +21,6 @@ import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.gson.Gson
 
 class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
@@ -38,12 +34,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     private var isAudioFocusGranted = false
     private var radioStations: List<RadioStation> = emptyList()
     private var currentStationIndex = 0
-    private var sleepTimer: CountDownTimer? = null
-    private var sleepTimerDuration: Long = 0
-    private var stats: MutableMap<String, Long> = mutableMapOf()
-    private lateinit var sharedPreferences: SharedPreferences
-    private var startTime: Long = 0
-
     fun getCurrentStation(): RadioStation? = currentStation
 
     inner class MusicBinder : Binder() {
@@ -55,8 +45,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         createNotificationChannel()
         isPlayingLiveData.postValue(false)
-        sharedPreferences = getSharedPreferences("listening_stats", Context.MODE_PRIVATE)
-        loadStats()
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -103,7 +91,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     }
 
     fun changeStation(station: RadioStation) {
-        stopTrackingTime()
         currentStation = station
         if (isPlaying()) {
             player?.stop()
@@ -113,7 +100,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
             player?.prepare()
             player?.play()
         }
-        startTrackingTime()
     }
 
     override fun onAudioFocusChange(focusChange: Int) {
@@ -168,13 +154,11 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         isPlayingLiveData.postValue(true)
         startRadioForeground()
         updateNotification()
-        startTrackingTime()
     }
     fun pauseRadio() {
         player?.pause()
         isPlayingLiveData.postValue(false)
         updateNotification()
-        stopTrackingTime()
     }
     private fun stopRadio() {
         abandonAudioFocus()
@@ -185,11 +169,9 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         isPlayingLiveData.postValue(false)
         stopForeground(true)
         stopSelf()
-        stopTrackingTime()
     }
 
     fun setStation(station: RadioStation) {
-        stopTrackingTime()
         currentStation = station
         playRadio()
     }
@@ -204,7 +186,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
     private fun playNextStation() {
         if (radioStations.isNotEmpty()) {
-            stopTrackingTime()
             currentStationIndex = (currentStationIndex + 1) % radioStations.size
             setStation(radioStations[currentStationIndex])
         }
@@ -212,7 +193,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
     private fun playPreviousStation() {
         if (radioStations.isNotEmpty()) {
-            stopTrackingTime()
             currentStationIndex = (currentStationIndex - 1 + radioStations.size) % radioStations.size
             setStation(radioStations[currentStationIndex])
         }
@@ -318,7 +298,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
             Log.e(TAG, "ExoPlayer error: ${error.message}, error code: ${error.errorCodeName}")
             isPlayingLiveData.postValue(false)
             updateNotification()
-            stopTrackingTime()
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -332,7 +311,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         abandonAudioFocus()
         player?.release()
         player = null
-        stopTrackingTime()
     }
 
     companion object {
@@ -353,60 +331,5 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     fun getAudioSessionIdLiveData(): MutableLiveData<Int?> {
         return audioSessionIdLiveData
     }
-
-    fun setSleepTimer(duration: Long) {
-        sleepTimer?.cancel()
-        sleepTimerDuration = duration
-        if (duration > 0) {
-            sleepTimer = object : CountDownTimer(duration, 1000) {
-                override fun onTick(millisUntilFinished: Long) {}
-
-                override fun onFinish() {
-                    pauseRadio()
-                    stopRadio()
-                }
-            }.start()
-        }
-    }
-
-    private fun startTrackingTime() {
-        startTime = System.currentTimeMillis()
-    }
-
-    private fun stopTrackingTime() {
-        if (currentStation == null || startTime == 0L) return
-
-        val endTime = System.currentTimeMillis()
-        val duration = endTime - startTime
-        startTime = 0
-
-        val stationName = currentStation?.name ?: "Unknown"
-        val currentDuration = stats[stationName] ?: 0
-        stats[stationName] = currentDuration + duration
-        saveStats()
-    }
-
-    private fun saveStats() {
-        val editor = sharedPreferences.edit()
-        val gson = Gson()
-        val json = gson.toJson(stats)
-        editor.putString("stats", json)
-        editor.apply()
-    }
-
-    private fun loadStats() {
-        val gson = Gson()
-        val json = sharedPreferences.getString("stats", null)
-        if (json != null) {
-            try {
-                val type = object : com.google.gson.reflect.TypeToken<MutableMap<String, Long>>() {}.type
-                stats = gson.fromJson(json, type) ?: mutableMapOf()
-            } catch (e: Exception) {
-                Log.e(TAG, "Error loading stats: ${e.message}")
-                stats = mutableMapOf()
-            }
-        } else {
-            stats = mutableMapOf()
-        }
-    }
 }
+

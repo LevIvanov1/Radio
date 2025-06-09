@@ -35,6 +35,8 @@ class ListenFragment : Fragment() {
                 musicService?.let {
                     if (it.isPlaying()) {
                         it.changeStation(radioStations[position])
+                    } else {
+                        it.setStationWithoutPlay(radioStations[position])
                     }
                 }
             }
@@ -59,7 +61,6 @@ class ListenFragment : Fragment() {
         override fun onServiceDisconnected(name: ComponentName?) {
             musicService = null
             isServiceBound = false
-            musicService = null
         }
     }
 
@@ -100,13 +101,12 @@ class ListenFragment : Fragment() {
         val startPosition = arguments?.getInt("SELECTED_POSITION", 0) ?: 0
         currentStationIndex = startPosition
         viewPager.setCurrentItem(startPosition, false)
-
         playPauseButton.setOnClickListener {
             if (isServiceBound && musicService != null) {
                 if (musicService?.isPlaying() == true) {
                     musicService?.pauseRadio()
                 } else {
-                    musicService?.setStation(radioStations[currentStationIndex])
+                    musicService?.setStation(radioStations[viewPager.currentItem])
                 }
             }
         }

@@ -8,63 +8,20 @@
     <fragment
         android:id="@+id/radioListFragment"
         android:name="com.example.chap.RadioListFragment"
-        tools:layout="@layout/fragment_radio_list"
-        android:label="Радио">
+        android:label="Radio Stations">
         <action
             android:id="@+id/action_radioListFragment_to_listenFragment"
-            app:destination="@id/listenFragment"
-            app:enterAnim="@anim/slideinright"
-            app:exitAnim="@anim/slideoutleft"
-            app:popEnterAnim="@anim/slideinleft"
-            app:popExitAnim="@anim/slideoutright"/>
-        <action
-            android:id="@+id/action_radioListFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment"
-            app:enterAnim="@anim/slideinright"
-            app:exitAnim="@anim/slideoutleft"
-            app:popEnterAnim="@anim/slideinleft"
-            app:popExitAnim="@anim/slideoutright"/>
+            app:destination="@id/listenFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/listenFragment"
         android:name="com.example.chap.ListenFragment"
         android:label="ListenFragment"
-        tools:layout="@layout/fragment_listen">
-        <action
-            android:id="@+id/action_listenFragment_to_radioListFragment"
-            app:destination="@id/radioListFragment"
-            app:enterAnim="@anim/slideinright"
-            app:exitAnim="@anim/slideoutleft"
-            app:popEnterAnim="@anim/slideinleft"
-            app:popExitAnim="@anim/slideoutright"/>
-    </fragment>
-
+        tools:layout="@layout/fragment_listen"/>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.chap.SettingsFragment"
         android:label="SettingsFragment"
-        tools:layout="@layout/fragment_settings">
-        <action
-            android:id="@+id/action_settingsFragment_to_radioListFragment"
-            app:destination="@id/radioListFragment"
-            app:enterAnim="@anim/slideinright"
-            app:exitAnim="@anim/slideoutleft"
-            app:popEnterAnim="@anim/slideinleft"
-            app:popExitAnim="@anim/slideoutright"/>
-    </fragment>
-
-    <fragment
-        android:id="@+id/statsFragment"
-        android:name="com.example.chap.StatsFragment"
-        android:label="StatsFragment"
-        tools:layout="@layout/fragment_stats">
-        <action
-            android:id="@+id/action_statsFragment_to_radioListFragment"
-            app:destination="@id/radioListFragment"
-            app:enterAnim="@anim/slideinright"
-            app:exitAnim="@anim/slideoutleft"
-            app:popEnterAnim="@anim/slideinleft"
-            app:popExitAnim="@anim/slideoutright"/>
-    </fragment>
+        tools:layout="@layout/fragment_settings"/>
 </navigation>
