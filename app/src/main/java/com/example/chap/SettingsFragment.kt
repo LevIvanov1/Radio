@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 
@@ -18,12 +19,34 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_preferences, rootKey)
 
+        findPreference<ListPreference>("sleep_timer_preference")?.setOnPreferenceChangeListener { _, newValue ->
+            val minutes = (newValue as String).toInt()
+            setSleepTimer(minutes)
+            true
+        }
+
         findPreference<Preference>("equalizer_preference")?.setOnPreferenceClickListener {
             if (!equalizerLaunched) {
                 equalizerLaunched = true
                 startActivity(Intent(requireContext(), EqualizerHostActivity::class.java))
             }
             true
+        }
+    }
+
+    private fun setSleepTimer(minutes: Int) {
+        activity?.let {
+            val intent = Intent(it, MusicService::class.java).apply {
+                action = MusicService.ACTION_SET_SLEEP_TIMER
+                putExtra(MusicService.EXTRA_SLEEP_TIMER_MINUTES, minutes)
+            }
+            it.startService(intent)
+
+            if (minutes > 0) {
+                Toast.makeText(it, "Таймер установлен на $minutes минут", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(it, "Таймер отключен", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

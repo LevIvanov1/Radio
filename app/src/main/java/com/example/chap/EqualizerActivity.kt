@@ -81,7 +81,6 @@ class EqualizerActivity : AppCompatActivity() {
             val minEQLevel = equalizer?.bandLevelRange?.get(0) ?: 0
             val maxEQLevel = equalizer?.bandLevelRange?.get(1) ?: 0
 
-            // Сохраняем начальные значения
             for (i in 0 until bandSeekBars.size) {
                 val band = i.toShort()
                 initialBandLevels.add(equalizer?.getBandLevel(band) ?: 0)
@@ -112,8 +111,6 @@ class EqualizerActivity : AppCompatActivity() {
             bassBoost?.enabled = true
             bassBoostSeekBar.max = 1000
             bassBoostSeekBar.progress = 0
-
-            // Сохраняем начальное значение бас-буста (по умолчанию 0)
             initialBassBoostStrength = 0
 
             bassBoostSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -196,7 +193,6 @@ class EqualizerActivity : AppCompatActivity() {
 
     private fun applyStandardPreset() {
         equalizer?.let { eq ->
-            // Восстанавливаем начальные значения
             for (i in 0 until bandSeekBars.size) {
                 val band = i.toShort()
                 eq.setBandLevel(band, initialBandLevels[i])

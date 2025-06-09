@@ -13,7 +13,9 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Binder
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
@@ -34,11 +36,15 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     private var isAudioFocusGranted = false
     private var radioStations: List<RadioStation> = emptyList()
     private var currentStationIndex = 0
+    private val sleepTimerHandler = Handler(Looper.getMainLooper())
+    private var sleepTimerRunnable: Runnable? = null
+    private var sleepTimerMinutes: Int = 0
     fun getCurrentStation(): RadioStation? = currentStation
 
     inner class MusicBinder : Binder() {
         fun getService(): MusicService = this@MusicService
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -58,6 +64,10 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
             ACTION_NEXT -> playNextStation()
             ACTION_PREVIOUS -> playPreviousStation()
             ACTION_STOP -> stopRadio()
+            ACTION_SET_SLEEP_TIMER -> {
+                val minutes = intent.getIntExtra(EXTRA_SLEEP_TIMER_MINUTES, 0)
+                setSleepTimer(minutes)
+            }
         }
         return START_STICKY
     }
@@ -306,14 +316,61 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         }
     }
 
+    fun setSleepTimer(minutes: Int) {
+        cancelSleepTimer()
+
+        if (minutes <= 0) return
+
+        sleepTimerMinutes = minutes
+        sleepTimerRunnable = Runnable {
+            stopRadio()
+            showSleepTimerNotification()
+        }
+
+        val delayMillis = minutes * 60 * 1000L
+        sleepTimerHandler.postDelayed(sleepTimerRunnable!!, delayMillis)
+
+        showSleepTimerNotification()
+    }
+
+    private fun cancelSleepTimer() {
+        sleepTimerRunnable?.let {
+            sleepTimerHandler.removeCallbacks(it)
+            sleepTimerRunnable = null
+        }
+        cancelSleepTimerNotification()
+    }
+
+    private fun showSleepTimerNotification() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Таймер сна")
+            .setContentText("Радио выключится через $sleepTimerMinutes минут")
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID + 1, notification)
+    }
+
+    private fun cancelSleepTimerNotification() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(NOTIFICATION_ID + 1)
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
         abandonAudioFocus()
+        cancelSleepTimer()
         player?.release()
         player = null
     }
 
     companion object {
+        const val ACTION_SET_SLEEP_TIMER = "com.example.chap.ACTION_SET_SLEEP_TIMER"
+        const val EXTRA_SLEEP_TIMER_MINUTES = "sleep_timer_minutes"
         private const val TAG = "MusicService"
         const val CHANNEL_ID = "radio_channel"
         const val NOTIFICATION_ID = 1

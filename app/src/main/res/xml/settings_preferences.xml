@@ -4,7 +4,6 @@
 
     <PreferenceCategory
         android:title="Внешний вид">
-
         <ListPreference
             android:key="theme_preference"
             android:title="Тема"
@@ -12,17 +11,25 @@
             android:entryValues="@array/theme_values"
             android:defaultValue="system"
             android:summary="Выберите тему приложения" />
-
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="Звук">
-
         <Preference
             android:key="equalizer_preference"
             android:title="Эквалайзер"
             android:summary="Настройка эквалайзера" />
+    </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Таймер сна">
+        <ListPreference
+            android:key="sleep_timer_preference"
+            android:title="Таймер отключения"
+            android:entries="@array/sleep_timer_entries"
+            android:entryValues="@array/sleep_timer_values"
+            android:defaultValue="0"
+            android:summary="Установите время до автоматического отключения радио" />
     </PreferenceCategory>
 
 </PreferenceScreen>

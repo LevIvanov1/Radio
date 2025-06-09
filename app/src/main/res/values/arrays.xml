@@ -27,4 +27,26 @@
         <item>coffee</item>
         <item>black</item>
     </string-array>
+
+    <string-array name="sleep_timer_entries">
+        <item>Выкл</item>
+        <item>1 минута</item>
+        <item>10 минут</item>
+        <item>30 минут</item>
+        <item>45 минут</item>
+        <item>60 минут</item>
+        <item>90 минут</item>
+        <item>120 минут</item>
+    </string-array>
+
+    <string-array name="sleep_timer_values">
+        <item>0</item>
+        <item>1</item>
+        <item>10</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+    </string-array>
 </resources>
