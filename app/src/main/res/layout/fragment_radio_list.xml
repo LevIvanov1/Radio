@@ -3,17 +3,60 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_marginTop="30dp"
-    android:layout_marginBottom="100dp"
+    android:layout_marginTop="20dp"
+    android:paddingBottom="100dp"
     android:layout_height="match_parent">
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/radioRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="80dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/searchContainer"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_search_background"
+        android:elevation="8dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+    <EditText
+        android:id="@+id/searchEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="   Поиск"
+        android:textColorHint="#99FFFFFF"
+        android:textColor="#FFFFFF"
+        android:background="@android:color/transparent"
+        android:singleLine="true"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:paddingVertical="8dp"
+        android:textSize="16sp" />
+
+    <ImageButton
+        android:id="@+id/clearSearchButton"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:contentDescription="Очистить поиск"
+        android:visibility="gone" />
+</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

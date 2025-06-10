@@ -5,17 +5,17 @@
     "streamUrl": "https://listen8.myradio24.com/71400"
   },
   {
-    "name": "Радио Шансон",
+    "name": "Радио Шансон Псков",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/shanson.png",
     "streamUrl": "https://chanson.hostingradio.ru:8041/chanson256.mp3"
   },
   {
-    "name": "Дорожное радио",
+    "name": "Дорожное радио Псков",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/dorojnoe.png",
     "streamUrl": "https://dorognoe.hostingradio.ru/dorognoe"
   },
   {
-    "name": "Русское радио",
+    "name": "Русское радио Псков",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/rusradio.png",
     "streamUrl": " https://rusradio.hostingradio.ru/rusradio96.aacp"
   },
@@ -25,14 +25,19 @@
     "streamUrl": "https://retro80.hostingradio.ru:8025/retro80-128.mp3"
   },
   {
-    "name": "НАШЕ Радио",
+    "name": "НАШЕ Радио Псков",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/nase-radio.png",
     "streamUrl": "https://nashe1.hostingradio.ru/nashe-256"
   },
   {
-    "name": "Радио Европа",
+    "name": "Европа Плюс Псков",
     "imageUrl": "https://top-radio.ru/assets/image/radio/180/europa-plus.png",
     "streamUrl": "https://ep256.hostingradio.ru:8052/europaplus256.mp3"
+  },
+  {
+    "name": "Радио Рекорд Псков",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/radiorecod.png",
+    "streamUrl": "https://radiorecord.hostingradio.ru/rr_main96.aacp"
   },
   {
     "name": "Народное радио Родники",
@@ -40,28 +45,63 @@
     "streamUrl": "https://rodniki.hostingradio.ru/rodniki128.mp3"
   },
   {
-    "name": "BEST DEEP FM",
-    "imageUrl": "https://top-radio.ru/assets/image/radio/180/best-deep-fm.jpg",
-    "streamUrl": "https://listen8.myradio24.com/5129"
+    "name": "Авторадио Псков",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/auto.png",
+    "streamUrl": "https://srv01.gpmradio.ru/stream/air/aac/64/100"
   },
   {
-    "name": "Japan Anime Songs",
-    "imageUrl": "https://zeno.fm/_ipx/_/https://images.zeno.fm/9l05MRejzw1rHNDaVInyDTXZGoPTVk5GMXitCDQgWaE/rs:fill:288:288/g:ce:0:0/aHR0cHM6Ly9wcm94eS56ZW5vLmZtL2NvbnRlbnQvc3RhdGlvbnMvYWd4emZucGxibTh0YzNSaGRITnlNZ3NTQ2tGMWRHaERiR2xsYm5RWWdJQ1E0dkNldWdzTUN4SU9VM1JoZEdsdmJsQnliMlpwYkdVWWdJQ1F4ZG5MLUFvTW9nRUVlbVZ1YncvaW1hZ2UvP3U9MTcxNTczMTQ3MjAwMA.webp",
-    "streamUrl": "https://stream-178.zeno.fm/e10726wdz4zuv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJlMTA3MjZ3ZHo0enV2IiwiaG9zdCI6InN0cmVhbS0xNzguemVuby5mbSIsInJ0dGwiOjUsImp0aSI6Ikd3X3FIOGE5UUpxX2JtQVF0UnlVQ0EiLCJpYXQiOjE3NDgyOTkzODMsImV4cCI6MTc0ODI5OTQ0M30.EeSYbK451i3j_nD_GASQM5wqD7W3jnNLpAuiN77NYlY"
+    "name": "Радио ENERGY Псков",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/energy.png",
+    "streamUrl": "https://srv21.gpmradio.ru:8443/stream/air/aac/64/99"
   },
   {
-    "name": "Король и Шут",
-    "imageUrl": "https://top-radio.ru/assets/image/radio/180/korol-i-shut-101ru.jpg",
-    "streamUrl": "https://pub0302.101.ru:8000/stream/pro/aac/64/191"
+    "name": "Радио Для Двоих Псков",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/radio-dlya-dvoix.jpg",
+    "streamUrl": "https://radiokrug.ru/radio/radiofortwo/icecast.audio"
   },
   {
-    "name": "Виктор Цой и группа КИНО",
-    "imageUrl": "https://top-radio.ru/assets/image/radio/180/kino-101.png",
-    "streamUrl": "https://pub0202.101.ru:8443/stream/pro/aac/64/103?"
+    "name": "ХИТ Нулевых",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/hitfm-hit2000.jpg",
+    "streamUrl": "https://hitfm-hit2000.hostingradio.ru/hit200096.aacp"
   },
   {
-    "name": "Modern Talking",
-    "imageUrl": "https://top-radio.ru/assets/image/radio/180/modern-talking-101ru.jpg",
-    "streamUrl": "https://pub0201.101.ru:8443/stream/pro/aac/64/115"
+    "name": "ХИТ Десятых",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/hitfm-hit2010.webp",
+    "streamUrl": "https://hitfm-hit2010.hostingradio.ru/hit201096.aacp"
+  },
+  {
+    "name": "Радио 7",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/radio7-na7holmah.png",
+    "streamUrl": "https://radio7.hostingradio.ru:8040/radio7256.mp3"
+  },
+  {
+    "name": "Русская Волна",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/russkaya-volna.png",
+    "streamUrl": "https://ru1.amgradio.ru/RuWave48"
+  },
+  {
+    "name": "Русский Рок - Русское Радио",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/russkij-rok-rusradio.jpg",
+    "streamUrl": "https://rr-russkijrok.hostingradio.ru/russkijrok96.aacp"
+  },
+  {
+    "name": "Диско Дача",
+    "imageUrl": "https://www.radiodacha.ru/backend/uploads/media/radiodacha/0021/01/thumb_2000194_radiodacha_medium.jpg",
+    "streamUrl": "https://stream2.n340.com/1_discodacha_56?type=aac&UID=893C8BBAE5FF58502EFCAFA4211687AB"
+  },
+  {
+    "name": "Владивосток FM",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/vladivostok-fm.jpg",
+    "streamUrl": "https://radiokrug.ru/radio/vladivostok/icecast.audio"
+  },
+  {
+    "name": "Родные Нулевые",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/rodnyie-nulevyie-rusradio.jpg",
+    "streamUrl": "https://rr-00.hostingradio.ru/rr0096.aacp"
+  },
+  {
+    "name": "Metallica - Радио Maximum",
+    "imageUrl": "https://top-radio.ru/assets/image/radio/180/maximum-metalica.jpg",
+    "streamUrl": "https://metallica.hostingradio.ru/metallica96.aacp"
   }
 ]

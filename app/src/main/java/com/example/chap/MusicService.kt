@@ -391,7 +391,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
             recentlyPlayedStations.remove(station)
         }
         recentlyPlayedStations.add(0, station)
-        if (recentlyPlayedStations.size > 5) {
+        if (recentlyPlayedStations.size > 3) {
             recentlyPlayedStations.removeAt(recentlyPlayedStations.size - 1)
         }
         saveRecentlyPlayed()

@@ -1,3 +1,4 @@
+
 package com.example.chap
 
 import RadioStation
@@ -11,9 +12,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -30,6 +34,10 @@ class RadioListFragment : Fragment() {
     private var musicService: MusicService? = null
     private var isServiceBound = false
     private var allStations: List<RadioStation> = emptyList()
+    private lateinit var searchEditText: EditText
+    private lateinit var clearSearchButton: ImageButton
+    private var currentAdapter: RadioListAdapter? = null
+    private var filteredStations: List<RadioStation> = emptyList()
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -60,13 +68,54 @@ class RadioListFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity()).get(RadioViewModel::class.java)
         recyclerView = view.findViewById(R.id.radioRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        searchEditText = view.findViewById(R.id.searchEditText)
+        clearSearchButton = view.findViewById(R.id.clearSearchButton)
 
         allStations = loadRadioStationsFromAssets()
         viewModel.setRadioStations(allStations)
+        filteredStations = allStations
 
         Intent(requireContext(), MusicService::class.java).also { intent ->
             requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         }
+
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                performSearch(searchEditText.text.toString())
+                true
+            } else {
+                false
+            }
+        }
+
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            clearSearchButton.isVisible = hasFocus && searchEditText.text.isNotEmpty()
+        }
+
+        searchEditText.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                clearSearchButton.isVisible = s?.isNotEmpty() == true
+                performSearch(s.toString())
+            }
+
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+
+        clearSearchButton.setOnClickListener {
+            searchEditText.text.clear()
+            performSearch("")
+        }
+    }
+
+    private fun performSearch(query: String) {
+        filteredStations = if (query.isNotEmpty()) {
+            allStations.filter { it.name.contains(query, ignoreCase = true) }
+        } else {
+            allStations
+        }
+        updateRecyclerView()
     }
 
     private fun setupRecyclerView() {
@@ -81,9 +130,9 @@ class RadioListFragment : Fragment() {
         if (recentlyPlayedStations.isNotEmpty()) {
             combinedList.add(RadioStation("Все станции", "", ""))
         }
-        combinedList.addAll(allStations)
+        combinedList.addAll(filteredStations)
 
-        recyclerView.adapter = RadioListAdapter(combinedList, { position ->
+        currentAdapter = RadioListAdapter(combinedList, { position ->
             val selectedStation = combinedList[position]
             if (selectedStation.imageUrl.isEmpty()) {
                 return@RadioListAdapter
@@ -110,9 +159,28 @@ class RadioListFragment : Fragment() {
             )
         }, musicService)
 
+        recyclerView.adapter = currentAdapter
+
         musicService?.getIsPlayingLiveData()?.observe(viewLifecycleOwner) { _ ->
             recyclerView.adapter?.notifyDataSetChanged()
         }
+    }
+
+    private fun updateRecyclerView() {
+        val recentlyPlayedStations = musicService?.getRecentlyPlayedStations() ?: emptyList()
+        val combinedList = mutableListOf<RadioStation>()
+
+        if (recentlyPlayedStations.isNotEmpty()) {
+            combinedList.add(RadioStation("Недавно прослушанные", "", ""))
+            combinedList.addAll(recentlyPlayedStations)
+        }
+
+        if (recentlyPlayedStations.isNotEmpty()) {
+            combinedList.add(RadioStation("Все станции", "", ""))
+        }
+        combinedList.addAll(filteredStations)
+
+        currentAdapter?.updateData(combinedList)
     }
 
     override fun onDestroyView() {
@@ -144,7 +212,7 @@ class RadioListFragment : Fragment() {
 }
 
 class RadioListAdapter(
-    private val stations: List<RadioStation>,
+    private var stations: List<RadioStation>,
     private val onItemClick: (Int) -> Unit,
     private val musicService: MusicService?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -217,4 +285,12 @@ class RadioListAdapter(
     }
 
     override fun getItemCount(): Int = stations.size
+
+    fun updateData(newStations: List<RadioStation>) {
+        stations = newStations
+        notifyDataSetChanged()
+    }
+
+    fun getStations(): List<RadioStation> = stations
 }
+

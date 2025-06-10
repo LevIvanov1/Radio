@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             }
             "dark" -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                setTheme(R.style.AppTheme_Night)
             }
             "coffee" -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
