@@ -1,3 +1,4 @@
+
 package com.example.chap
 
 import RadioStation
@@ -23,6 +24,8 @@ import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
@@ -39,18 +42,22 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     private val sleepTimerHandler = Handler(Looper.getMainLooper())
     private var sleepTimerRunnable: Runnable? = null
     private var sleepTimerMinutes: Int = 0
+    private val recentlyPlayedStations = mutableListOf<RadioStation>()
+    private val sharedPreferences by lazy { getSharedPreferences("radio_prefs", Context.MODE_PRIVATE) }
+    private val gson = Gson()
+
     fun getCurrentStation(): RadioStation? = currentStation
 
     inner class MusicBinder : Binder() {
         fun getService(): MusicService = this@MusicService
     }
 
-
     override fun onCreate() {
         super.onCreate()
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         createNotificationChannel()
         isPlayingLiveData.postValue(false)
+        loadRecentlyPlayed()
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -102,6 +109,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
     fun changeStation(station: RadioStation) {
         currentStation = station
+        addToRecentlyPlayed(station)
         if (isPlaying()) {
             player?.stop()
             player?.clearMediaItems()
@@ -165,11 +173,13 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         startRadioForeground()
         updateNotification()
     }
+
     fun pauseRadio() {
         player?.pause()
         isPlayingLiveData.postValue(false)
         updateNotification()
     }
+
     private fun stopRadio() {
         abandonAudioFocus()
         player?.stop()
@@ -183,6 +193,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
     fun setStation(station: RadioStation) {
         currentStation = station
+        addToRecentlyPlayed(station)
         playRadio()
     }
 
@@ -293,12 +304,15 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
                     isPlayingLiveData.postValue(false)
                     updateNotification()
                 }
+
                 Player.STATE_ENDED -> {
                     isPlayingLiveData.postValue(false)
                     updateNotification()
                 }
+
                 Player.STATE_READY -> {
                 }
+
                 Player.STATE_BUFFERING -> {
                 }
             }
@@ -359,6 +373,38 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         notificationManager.cancel(NOTIFICATION_ID + 1)
     }
 
+    fun addToRecentlyPlayed(station: RadioStation) {
+        if (recentlyPlayedStations.contains(station)) {
+            recentlyPlayedStations.remove(station)
+        }
+        recentlyPlayedStations.add(0, station)
+        if (recentlyPlayedStations.size > 5) {
+            recentlyPlayedStations.removeAt(recentlyPlayedStations.size - 1)
+        }
+        saveRecentlyPlayed()
+    }
+
+    fun getRecentlyPlayedStations(): List<RadioStation> {
+        return recentlyPlayedStations
+    }
+
+    private fun saveRecentlyPlayed() {
+        val recentlyPlayedJson = gson.toJson(recentlyPlayedStations)
+        sharedPreferences.edit().putString("recently_played", recentlyPlayedJson).apply()
+    }
+
+    private fun loadRecentlyPlayed() {
+        val recentlyPlayedJson = sharedPreferences.getString("recently_played", null)
+        if (recentlyPlayedJson != null) {
+            val typeToken = object : TypeToken<List<RadioStation>>() {}.type
+            try {
+                val loadedList: List<RadioStation> = gson.fromJson(recentlyPlayedJson, typeToken)
+                recentlyPlayedStations.addAll(loadedList)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading recently played stations: ${e.message}")
+            }
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -389,4 +435,3 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         return audioSessionIdLiveData
     }
 }
-

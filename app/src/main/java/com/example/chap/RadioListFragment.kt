@@ -1,3 +1,4 @@
+
 package com.example.chap
 
 import RadioStation
@@ -29,6 +30,7 @@ class RadioListFragment : Fragment() {
     private lateinit var viewModel: RadioViewModel
     private var musicService: MusicService? = null
     private var isServiceBound = false
+    private var allStations: List<RadioStation> = emptyList()
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -59,8 +61,8 @@ class RadioListFragment : Fragment() {
         recyclerView = view.findViewById(R.id.radioRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val stations = loadRadioStationsFromAssets()
-        viewModel.setRadioStations(stations)
+        allStations = loadRadioStationsFromAssets()
+        viewModel.setRadioStations(allStations)
 
         Intent(requireContext(), MusicService::class.java).also { intent ->
             requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
@@ -68,10 +70,26 @@ class RadioListFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        val stations = viewModel.getRadioStations()
-        recyclerView.adapter = RadioListAdapter(stations, { position ->
-            val selectedStation = stations[position]
-            viewModel.setCurrentStationIndex(position)
+        val recentlyPlayedStations = musicService?.getRecentlyPlayedStations() ?: emptyList()
+        val combinedList = mutableListOf<RadioStation>()
+
+        if (recentlyPlayedStations.isNotEmpty()) {
+            combinedList.add(RadioStation("Недавно прослушанные", "", ""))
+            combinedList.addAll(recentlyPlayedStations)
+        }
+
+        if (recentlyPlayedStations.isNotEmpty()) {
+            combinedList.add(RadioStation("Все станции", "", ""))
+        }
+        combinedList.addAll(allStations)
+
+        recyclerView.adapter = RadioListAdapter(combinedList, { position ->
+            val selectedStation = combinedList[position]
+            if (selectedStation.imageUrl.isEmpty()) {
+                return@RadioListAdapter
+            }
+
+            val originalIndex = allStations.indexOfFirst { it.streamUrl == selectedStation.streamUrl }
 
             musicService?.let { service ->
                 val isSameStationPlaying = service.isPlaying() &&
@@ -85,10 +103,9 @@ class RadioListFragment : Fragment() {
                     }
                 }
             }
-
             findNavController().navigate(
                 R.id.action_radioListFragment_to_listenFragment,
-                Bundle().apply { putInt("SELECTED_POSITION", position) }
+                Bundle().apply { putInt("SELECTED_POSITION", originalIndex) }
             )
         }, musicService)
 
@@ -129,7 +146,9 @@ class RadioListAdapter(
     private val stations: List<RadioStation>,
     private val onItemClick: (Int) -> Unit,
     private val musicService: MusicService?
-) : RecyclerView.Adapter<RadioListAdapter.RadioViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val TYPE_STATION = 0
+    private val TYPE_HEADER = 1
 
     inner class RadioViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.stationImageView)
@@ -137,44 +156,62 @@ class RadioListAdapter(
         val playButton: ImageButton = itemView.findViewById(R.id.playButton)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RadioViewHolder {
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.radio_list_item, parent, false)
-        return RadioViewHolder(itemView)
+    inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val headerTextView: TextView = itemView.findViewById(R.id.headerTextView)
     }
 
-    override fun onBindViewHolder(holder: RadioViewHolder, position: Int) {
-        val station = stations[position]
-
-        holder.nameTextView.text = station.name
-        Glide.with(holder.itemView.context)
-            .load(station.imageUrl)
-            .into(holder.imageView)
-
-        musicService?.let { service ->
-            val isCurrentStationPlaying = service.isPlaying() &&
-                    service.getCurrentStation()?.streamUrl == station.streamUrl
-
-            holder.playButton.setImageResource(
-                if (isCurrentStationPlaying) R.drawable.ic_pause else androidx.media3.session.R.drawable.media3_icon_play
-            )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val itemView = LayoutInflater.from(parent.context)
+        if (viewType == TYPE_STATION) {
+            return RadioViewHolder(itemView.inflate(R.layout.radio_list_item, parent, false))
+        } else {
+            return HeaderViewHolder(itemView.inflate(R.layout.header_list_item, parent, false))
         }
+    }
 
-        holder.playButton.setOnClickListener {
+    override fun getItemViewType(position: Int): Int {
+        return if (stations[position].imageUrl.isEmpty()) {
+            TYPE_HEADER
+        } else {
+            TYPE_STATION
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val station = stations[position]
+        if (holder is RadioViewHolder) {
+            holder.nameTextView.text = station.name
+            Glide.with(holder.itemView.context)
+                .load(station.imageUrl)
+                .into(holder.imageView)
+
             musicService?.let { service ->
-                if (service.isPlaying() && service.getCurrentStation()?.streamUrl == station.streamUrl) {
-                    service.pauseRadio()
-                    holder.playButton.setImageResource(androidx.media3.session.R.drawable.media3_icon_play)
-                } else {
-                    service.setStation(station)
-                    holder.playButton.setImageResource(R.drawable.ic_pause)
-                    notifyDataSetChanged()
+                val isCurrentStationPlaying = service.isPlaying() &&
+                        service.getCurrentStation()?.streamUrl == station.streamUrl
+
+                holder.playButton.setImageResource(
+                    if (isCurrentStationPlaying) R.drawable.ic_pause else androidx.media3.session.R.drawable.media3_icon_play
+                )
+            }
+
+            holder.playButton.setOnClickListener {
+                musicService?.let { service ->
+                    if (service.isPlaying() && service.getCurrentStation()?.streamUrl == station.streamUrl) {
+                        service.pauseRadio()
+                        holder.playButton.setImageResource(androidx.media3.session.R.drawable.media3_icon_play)
+                    } else {
+                        service.setStation(station)
+                        holder.playButton.setImageResource(R.drawable.ic_pause)
+                        notifyDataSetChanged()
+                    }
                 }
             }
-        }
 
-        holder.itemView.setOnClickListener {
-            onItemClick(position)
+            holder.itemView.setOnClickListener {
+                onItemClick(position)
+            }
+        } else if (holder is HeaderViewHolder) {
+            holder.headerTextView.text = station.name
         }
     }
 
