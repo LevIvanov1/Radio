@@ -1,4 +1,3 @@
-
 package com.example.chap
 
 import RadioStation
@@ -36,6 +35,7 @@ class RadioListFragment : Fragment() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as MusicService.MusicBinder
             musicService = binder.getService()
+            musicService?.setRadioStations(allStations)
             isServiceBound = true
             setupRecyclerView()
         }
@@ -99,7 +99,8 @@ class RadioListFragment : Fragment() {
                     if (service.isPlaying()) {
                         service.changeStation(selectedStation)
                     } else {
-                        service.setStationWithoutPlay(selectedStation)
+                        service.setRadioStations(allStations)
+                        service.setStation(selectedStation)
                     }
                 }
             }

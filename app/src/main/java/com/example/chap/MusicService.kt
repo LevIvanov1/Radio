@@ -1,4 +1,3 @@
-
 package com.example.chap
 
 import RadioStation
@@ -65,11 +64,18 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "onStartCommand: action=${intent?.action}, stations.size=${radioStations.size}, currentIndex=$currentStationIndex")
         when (intent?.action) {
             ACTION_PLAY -> playRadio()
             ACTION_PAUSE -> pauseRadio()
-            ACTION_NEXT -> playNextStation()
-            ACTION_PREVIOUS -> playPreviousStation()
+            ACTION_NEXT -> {
+                Log.d(TAG, "ACTION_NEXT: currentIndex=$currentStationIndex, stations.size=${radioStations.size}")
+                playNextStation()
+            }
+            ACTION_PREVIOUS -> {
+                Log.d(TAG, "ACTION_PREVIOUS: currentIndex=$currentStationIndex, stations.size=${radioStations.size}")
+                playPreviousStation()
+            }
             ACTION_STOP -> stopRadio()
             ACTION_SET_SLEEP_TIMER -> {
                 val minutes = intent.getIntExtra(EXTRA_SLEEP_TIMER_MINUTES, 0)
@@ -105,10 +111,12 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
     fun setStationWithoutPlay(station: RadioStation) {
         currentStation = station
+        currentStationIndex = radioStations.indexOf(station)
     }
 
     fun changeStation(station: RadioStation) {
         currentStation = station
+        currentStationIndex = radioStations.indexOf(station)
         addToRecentlyPlayed(station)
         if (isPlaying()) {
             player?.stop()
@@ -193,6 +201,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
     fun setStation(station: RadioStation) {
         currentStation = station
+        currentStationIndex = radioStations.indexOf(station)
         addToRecentlyPlayed(station)
         playRadio()
     }
@@ -206,15 +215,19 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     }
 
     private fun playNextStation() {
+        Log.d(TAG, "playNextStation: before - currentIndex=$currentStationIndex, stations.size=${radioStations.size}")
         if (radioStations.isNotEmpty()) {
             currentStationIndex = (currentStationIndex + 1) % radioStations.size
+            Log.d(TAG, "playNextStation: after - currentIndex=$currentStationIndex")
             setStation(radioStations[currentStationIndex])
         }
     }
 
     private fun playPreviousStation() {
+        Log.d(TAG, "playPreviousStation: before - currentIndex=$currentStationIndex, stations.size=${radioStations.size}")
         if (radioStations.isNotEmpty()) {
             currentStationIndex = (currentStationIndex - 1 + radioStations.size) % radioStations.size
+            Log.d(TAG, "playPreviousStation: after - currentIndex=$currentStationIndex")
             setStation(radioStations[currentStationIndex])
         }
     }
