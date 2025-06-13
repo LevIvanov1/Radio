@@ -40,25 +40,14 @@
             android:layout_marginEnd="16dp"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/stationImageView"
-            app:layout_constraintEnd_toStartOf="@id/playButton"
+            app:layout_constraintEnd_toStartOf="@id/favoriteButton"
             app:layout_constraintStart_toEndOf="@id/stationImageView"
             app:layout_constraintTop_toTopOf="@id/stationImageView"/>
 
         <ImageButton
-            android:id="@+id/playButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_start"
-            app:tint="?attr/colorOnSurface"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-        <ImageButton
             android:id="@+id/favoriteButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="50dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/media3_icon_star_filled"
             app:tint="?attr/colorOnSurface"
@@ -66,7 +55,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-
+        <ImageButton
+            android:id="@+id/playButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/media3_icon_play"
+        app:tint="?attr/colorOnSurface"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/favoriteButton"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="8dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -7,7 +7,6 @@
     android:paddingBottom="100dp"
     android:layout_height="match_parent">
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/radioRecyclerView"
         android:layout_width="0dp"
@@ -28,6 +27,7 @@
         android:orientation="horizontal"
         android:background="@drawable/rounded_search_background"
         android:elevation="8dp"
+        android:backgroundTint="?attr/colorPrimary"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:gravity="center_vertical"
@@ -44,6 +44,7 @@
         android:textColorHint="#99FFFFFF"
         android:textColor="#FFFFFF"
         android:background="@android:color/transparent"
+        android:backgroundTint="?attr/colorPrimary"
         android:singleLine="true"
         android:imeOptions="actionSearch"
         android:inputType="text"

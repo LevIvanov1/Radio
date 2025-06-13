@@ -16,7 +16,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import com.bumptech.glide.Glide
@@ -44,6 +43,12 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     private val recentlyPlayedStations = mutableListOf<RadioStation>()
     private val sharedPreferences by lazy { getSharedPreferences("radio_prefs", Context.MODE_PRIVATE) }
     private val gson = Gson()
+    private val favoriteStations = mutableListOf<RadioStation>()
+    private val favoriteStationsLiveData = MutableLiveData<List<RadioStation>>()
+
+    init {
+        favoriteStationsLiveData.value = favoriteStations
+    }
 
     fun getCurrentStation(): RadioStation? = currentStation
 
@@ -57,6 +62,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         createNotificationChannel()
         isPlayingLiveData.postValue(false)
         loadRecentlyPlayed()
+        loadFavoriteStations()
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -64,22 +70,23 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(TAG, "onStartCommand: action=${intent?.action}, stations.size=${radioStations.size}, currentIndex=$currentStationIndex")
         when (intent?.action) {
             ACTION_PLAY -> playRadio()
             ACTION_PAUSE -> pauseRadio()
-            ACTION_NEXT -> {
-                Log.d(TAG, "ACTION_NEXT: currentIndex=$currentStationIndex, stations.size=${radioStations.size}")
-                playNextStation()
-            }
-            ACTION_PREVIOUS -> {
-                Log.d(TAG, "ACTION_PREVIOUS: currentIndex=$currentStationIndex, stations.size=${radioStations.size}")
-                playPreviousStation()
-            }
+            ACTION_NEXT -> playNextStation()
+            ACTION_PREVIOUS -> playPreviousStation()
             ACTION_STOP -> stopRadio()
             ACTION_SET_SLEEP_TIMER -> {
                 val minutes = intent.getIntExtra(EXTRA_SLEEP_TIMER_MINUTES, 0)
                 setSleepTimer(minutes)
+            }
+            ACTION_TOGGLE_FAVORITE -> {
+                val station = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(EXTRA_STATION, RadioStation::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(EXTRA_STATION)
+                }
             }
         }
         return START_STICKY
@@ -215,19 +222,15 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     }
 
     private fun playNextStation() {
-        Log.d(TAG, "playNextStation: before - currentIndex=$currentStationIndex, stations.size=${radioStations.size}")
         if (radioStations.isNotEmpty()) {
             currentStationIndex = (currentStationIndex + 1) % radioStations.size
-            Log.d(TAG, "playNextStation: after - currentIndex=$currentStationIndex")
             setStation(radioStations[currentStationIndex])
         }
     }
 
     private fun playPreviousStation() {
-        Log.d(TAG, "playPreviousStation: before - currentIndex=$currentStationIndex, stations.size=${radioStations.size}")
         if (radioStations.isNotEmpty()) {
             currentStationIndex = (currentStationIndex - 1 + radioStations.size) % radioStations.size
-            Log.d(TAG, "playPreviousStation: after - currentIndex=$currentStationIndex")
             setStation(radioStations[currentStationIndex])
         }
     }
@@ -285,7 +288,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
                 notificationBuilder.setLargeIcon(bitmap)
                 futureTarget.cancel(false)
             } catch (e: Exception) {
-                Log.e(TAG, "Error loading notification image: ${e.message}")
             }
         }
 
@@ -332,7 +334,6 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         }
 
         override fun onPlayerError(error: com.google.android.exoplayer2.PlaybackException) {
-            Log.e(TAG, "ExoPlayer error: ${error.message}, error code: ${error.errorCodeName}")
             isPlayingLiveData.postValue(false)
             updateNotification()
         }
@@ -414,9 +415,46 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
                 val loadedList: List<RadioStation> = gson.fromJson(recentlyPlayedJson, typeToken)
                 recentlyPlayedStations.addAll(loadedList)
             } catch (e: Exception) {
-                Log.e(TAG, "Error loading recently played stations: ${e.message}")
             }
         }
+    }
+
+    fun toggleFavorite(station: RadioStation) {
+        if (favoriteStations.contains(station)) {
+            favoriteStations.remove(station)
+            station.isFavorite = false
+        } else {
+            favoriteStations.add(station)
+            station.isFavorite = true
+        }
+        favoriteStationsLiveData.postValue(favoriteStations)
+        saveFavoriteStations()
+    }
+
+    fun getFavoriteStations(): List<RadioStation> {
+        return favoriteStations
+    }
+
+    fun getFavoriteStationsLiveData(): MutableLiveData<List<RadioStation>> {
+        return favoriteStationsLiveData
+    }
+
+    private fun saveFavoriteStations() {
+        val favoriteStationsJson = gson.toJson(favoriteStations)
+        sharedPreferences.edit().putString("favorite_stations", favoriteStationsJson).apply()
+    }
+
+    private fun loadFavoriteStations() {
+        val favoriteStationsJson = sharedPreferences.getString("favorite_stations", null)
+        if (favoriteStationsJson != null) {
+            val typeToken = object : TypeToken<List<RadioStation>>() {}.type
+            try {
+                val loadedList: List<RadioStation> = gson.fromJson(favoriteStationsJson, typeToken)
+                favoriteStations.addAll(loadedList)
+            } catch (e: Exception) {
+            }
+        }
+        favoriteStationsLiveData.postValue(favoriteStations)
     }
 
     override fun onDestroy() {
@@ -430,14 +468,15 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
     companion object {
         const val ACTION_SET_SLEEP_TIMER = "com.example.chap.ACTION_SET_SLEEP_TIMER"
         const val EXTRA_SLEEP_TIMER_MINUTES = "sleep_timer_minutes"
-        private const val TAG = "MusicService"
-        const val CHANNEL_ID = "radio_channel"
+        private const val CHANNEL_ID = "radio_channel"
         const val NOTIFICATION_ID = 1
         const val ACTION_PLAY = "com.example.chap.ACTION_PLAY"
         const val ACTION_PAUSE = "com.example.chap.ACTION_PAUSE"
         const val ACTION_NEXT = "com.example.chap.ACTION_NEXT"
         const val ACTION_PREVIOUS = "com.example.chap.ACTION_PREVIOUS"
         const val ACTION_STOP = "com.example.chap.ACTION_STOP"
+        const val ACTION_TOGGLE_FAVORITE = "com.example.chap.ACTION_TOGGLE_FAVORITE"
+        const val EXTRA_STATION = "com.example.chap.EXTRA_STATION"
     }
 
     fun getIsPlayingLiveData(): MutableLiveData<Boolean> {

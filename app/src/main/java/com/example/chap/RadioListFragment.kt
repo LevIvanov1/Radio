@@ -1,4 +1,3 @@
-
 package com.example.chap
 
 import RadioStation
@@ -8,7 +7,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -157,7 +155,9 @@ class RadioListFragment : Fragment() {
                 R.id.action_radioListFragment_to_listenFragment,
                 Bundle().apply { putInt("SELECTED_POSITION", originalIndex) }
             )
-        }, musicService)
+        }, musicService, { station ->
+            toggleFavorite(station)
+        })
 
         recyclerView.adapter = currentAdapter
 
@@ -175,12 +175,35 @@ class RadioListFragment : Fragment() {
             combinedList.addAll(recentlyPlayedStations)
         }
 
-        if (recentlyPlayedStations.isNotEmpty()) {
+        val allStationsHeaderAdded = recentlyPlayedStations.isNotEmpty()
+        if (allStationsHeaderAdded) {
             combinedList.add(RadioStation("Все станции", "", ""))
         }
-        combinedList.addAll(filteredStations)
+
+        filteredStations.forEach { filteredStation ->
+            val isFavorite = musicService?.getFavoriteStations()?.contains(filteredStation) ?: false
+            val index = combinedList.indexOfFirst { it.streamUrl == filteredStation.streamUrl }
+            if (index != -1) {
+                combinedList[index] = combinedList[index].copy(isFavorite = isFavorite)
+            } else {
+                combinedList.add(filteredStation.copy(isFavorite = isFavorite))
+            }
+        }
 
         currentAdapter?.updateData(combinedList)
+    }
+
+    private fun toggleFavorite(station: RadioStation) {
+        musicService?.toggleFavorite(station)
+
+        val favoriteStations = musicService?.getFavoriteStations()
+        allStations.forEach { st ->
+            st.isFavorite = favoriteStations?.contains(st) ?: false
+        }
+        filteredStations.forEach { st ->
+            st.isFavorite = favoriteStations?.contains(st) ?: false
+        }
+        currentAdapter?.notifyDataSetChanged()
     }
 
     override fun onDestroyView() {
@@ -200,8 +223,6 @@ class RadioListFragment : Fragment() {
             inputStream.close()
             String(buffer, Charsets.UTF_8)
         } catch (e: IOException) {
-            e.printStackTrace()
-            Log.e("ListenFragment", "Error reading stations.json: ${e.message}")
             return emptyList()
         }
 
@@ -209,24 +230,43 @@ class RadioListFragment : Fragment() {
         val typeToken = object : TypeToken<List<RadioStation>>() {}.type
         return gson.fromJson<List<RadioStation>>(jsonString, typeToken)
     }
+    override fun onResume() {
+        super.onResume()
+        updateRadioStationsWithFavoriteStatus()
+    }
+
+    private fun updateRadioStationsWithFavoriteStatus() {
+        musicService?.let { service ->
+            val favoriteStations = service.getFavoriteStations()
+            allStations.forEach { station ->
+                station.isFavorite = favoriteStations.any { it.streamUrl == station.streamUrl }
+            }
+            filteredStations.forEach { station ->
+                station.isFavorite = favoriteStations.any { it.streamUrl == station.streamUrl }
+            }
+            updateRecyclerView()
+        }
+    }
 }
 
 class RadioListAdapter(
     private var stations: List<RadioStation>,
     private val onItemClick: (Int) -> Unit,
-    private val musicService: MusicService?
+    private val musicService: MusicService?,
+    private val onFavoriteClick: (RadioStation) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val TYPE_STATION = 0
     private val TYPE_HEADER = 1
 
     inner class RadioViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.stationImageView)
-        val nameTextView: TextView = itemView.findViewById(R.id.stationNameTextView)
-        val playButton: ImageButton = itemView.findViewById(R.id.playButton)
+        val imageView: ImageView = itemView.findViewById(R.id.stationImageView) ?: error("stationImageView not found")
+        val nameTextView: TextView = itemView.findViewById(R.id.stationNameTextView) ?: error("stationNameTextView not found")
+        val playButton: ImageButton = itemView.findViewById(R.id.playButton) ?: error("playButton not found")
+        val favoriteButton: ImageButton = itemView.findViewById(R.id.favoriteButton) ?: error("favoriteButton not found")
     }
 
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val headerTextView: TextView = itemView.findViewById(R.id.headerTextView)
+        val headerTextView: TextView = itemView.findViewById(R.id.headerTextView) ?: error("headerTextView not found")
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -279,6 +319,13 @@ class RadioListAdapter(
             holder.itemView.setOnClickListener {
                 onItemClick(position)
             }
+
+            holder.favoriteButton.setImageResource(if (station.isFavorite) androidx.media3.session.R.drawable.media3_icon_star_filled else androidx.media3.session.R.drawable.media3_icon_star_unfilled)
+
+            holder.favoriteButton.setOnClickListener {
+                onFavoriteClick(station)
+                holder.favoriteButton.setImageResource(if (station.isFavorite) androidx.media3.session.R.drawable.media3_icon_star_unfilled else androidx.media3.session.R.drawable.media3_icon_star_filled)
+            }
         } else if (holder is HeaderViewHolder) {
             holder.headerTextView.text = station.name
         }
@@ -293,4 +340,3 @@ class RadioListAdapter(
 
     fun getStations(): List<RadioStation> = stations
 }
-
